@@ -64,6 +64,7 @@ import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -171,7 +172,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	boolean beginWrite        = true ;
 	boolean setupDone         = false;
 	boolean choiceViaMenu     = false;
-	boolean canobieIsChecked  = true ;
+	private static boolean canobieIsChecked  = true;
+	private static boolean canobieBackup     = true;
 	
 	File SDFile;
 	FileWriter gpxwriter;
@@ -351,6 +353,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         
+        /* this will cause a problem if location manager returns null*/
         mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
         
         accel       = new float[4];
@@ -567,8 +570,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			    		case DIALOG_OK:
 			    	  		partialSessionName = sessionName.getText().toString();
 			    	  		setupDone = true;
+			    	  		canobieBackup = canobieIsChecked;
 			    			break;
 			    	  	case DIALOG_CANCELED:
+			    	  		canobieIsChecked = canobieBackup;
 			    	  		break;
 			    	  }
 			          rideName.setText("Ride Name: " + rideNameString /*+ " " + seats.getText().toString()*/);
@@ -732,6 +737,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     private AlertDialog getSavePrompt(final Handler h, String message) {		
         
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	
+    	canobieIsChecked = canobieBackup;
                 
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = vi.inflate(R.layout.setup, null);
@@ -788,8 +795,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 		});
         
         canobieCheck = (CheckBox) v.findViewById(R.id.isCanobie);
-        
-        if(canobieIsChecked)
+        if (canobieIsChecked)
         	canobieCheck.setChecked(true);
         else
         	canobieCheck.setChecked(false);
@@ -799,7 +805,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
 				
-				if( canobieCheck.isChecked() ) {
+				if (canobieCheck.isChecked()) {
 					canobieIsChecked = true;
 					rides.setAdapter(canobieAdapter);
 				} else {
