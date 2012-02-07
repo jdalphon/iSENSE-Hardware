@@ -27,9 +27,9 @@ public class LoginActivity {
 	
 	private String message = "";
 	/* { */
-		String unknownUser    = "Connection to internet has been found, but the username or password was incorrect.  Please try again.";
-		String noConnection   = "No connection to internet through either wifi or mobile found.  Please enable one to continue, then try again."; 
-		String defaultMessage = "Was your username and password correct?\nAre you connected to the internet?\nPlease try again.";
+		private static final String unknownUser    = "Connection to internet has been found, but the username or password was incorrect.  Please try again.";
+		private static final String noConnection   = "No connection to internet through either wifi or mobile found.  Please enable one to continue, then try again."; 
+		private static final String defaultMessage = "Was your username and password correct?\nAre you connected to the internet?\nPlease try again.";
 	/* } */
 	
 	@SuppressWarnings("unused")

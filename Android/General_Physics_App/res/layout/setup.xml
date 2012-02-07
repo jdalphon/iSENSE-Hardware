@@ -36,6 +36,7 @@
 			android:inputType="text"
 			android:id="@+id/sessionName" 
 			android:maxLength="50"
+			android:imeOptions="actionDone"
 			android:layout_height="wrap_content" 
 			android:layout_alignParentTop="true" 
 			android:layout_toRightOf="@+id/nameLabel">
@@ -64,7 +65,6 @@
 			android:layout_toRightOf="@id/ExperimentLabel"
 			android:inputType="phone"
 			android:digits="1234567890"
-			android:singleLine="true"
 			android:layout_height="wrap_content"/>
 		
 		<Button android:layout_height="wrap_content" 
@@ -104,7 +104,7 @@
 			android:layout_width="fill_parent" 
 			android:inputType="phone"
 			android:digits="1234567890"
-			android:singleLine="true"
+			android:imeOptions="actionDone"
 			android:maxLength="12"
 			android:id="@+id/studentNumber" 
 			android:layout_height="wrap_content" 

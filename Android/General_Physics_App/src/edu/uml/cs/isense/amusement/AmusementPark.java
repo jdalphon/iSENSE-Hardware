@@ -64,7 +64,6 @@ import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,9 +79,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import edu.uml.cs.isense.comm.RestAPI;
-import edu.uml.cs.isense.amusement.R;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
 	
