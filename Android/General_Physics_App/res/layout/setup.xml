@@ -33,7 +33,7 @@
 			android:paddingTop="12dip"/>
 		<EditText android:text=""
 			android:layout_width="fill_parent" 
-			android:inputType="text" 
+			android:inputType="text"
 			android:id="@+id/sessionName" 
 			android:maxLength="50"
 			android:layout_height="wrap_content" 

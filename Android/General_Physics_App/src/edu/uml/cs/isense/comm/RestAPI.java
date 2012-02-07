@@ -48,6 +48,8 @@ public class RestAPI {
 	private int uid;
 	private JSONArray dataCache;
 	
+	public static String connection = "";
+	
 	protected RestAPI() {
 
     }
@@ -380,12 +382,15 @@ public class RestAPI {
 	public Boolean login(String username, String password) {
 		String url = "method=login&username=" + URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password);
 		
-/*		if(!(connectivityManager != null)) Log.e(null, "FAIL 1: No connectivity manager");
-		if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) Log.e(null, "FAIL 2: No wifi");
-		if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) Log.e(null, "FAIL 3: No 3G");
-	*/	
+		/*if((!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
+				(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) 
+			connection = "NONE";
+		else
+			connection = "";
+		*/
 		if (connectivityManager != null && ( connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) {
 			try {
+				connection = "";
 				String data = makeRequest(url);
 				
 				// Parse JSON Result
@@ -411,6 +416,7 @@ public class RestAPI {
 			
 			return true;
 		}
+		connection = "NONE";
 		return false;
 	}
 	

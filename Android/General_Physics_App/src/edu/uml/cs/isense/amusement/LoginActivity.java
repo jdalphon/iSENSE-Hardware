@@ -25,6 +25,13 @@ public class LoginActivity {
 	
 	boolean success;
 	
+	private String message = "";
+	/* { */
+		String unknownUser    = "Connection to internet has been found, but the username or password was incorrect.  Please try again.";
+		String noConnection   = "No connection to internet through either wifi or mobile found.  Please enable one to continue, then try again."; 
+		String defaultMessage = "Was your username and password correct?\nAre you connected to the internet?\nPlease try again.";
+	/* } */
+	
 	@SuppressWarnings("unused")
 		private SharedPreferences settings;
 	
@@ -86,10 +93,13 @@ public class LoginActivity {
 		final Message msg = Message.obtain();
 		msg.setTarget(h);
 		msg.what = LOGIN_FAILED;
-		
+		if(RestAPI.connection == "NONE") message = noConnection;
+		else if(RestAPI.connection == "") message = unknownUser;
+		else message = defaultMessage;
+			
 		new AlertDialog.Builder(mContext)
 			.setTitle("Login Failed")
-			.setMessage("Was your username and password correct?\nAre you connected to the internet?")
+			.setMessage(message)
 			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			
 			@Override

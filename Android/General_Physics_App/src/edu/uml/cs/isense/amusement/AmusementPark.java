@@ -704,11 +704,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	builder.setTitle("Cannot Upload to iSENSE")
 	    	.setMessage("You are either not logged into iSENSE, or you have not provided a valid Experiment ID to upload your data to. " +
 	    			"You will be returned to the main screen, but you may go to Menu -> Upload to upload this data set once you log in " +
-	    			"to iSENSE and provide a valid Experiment ID.  You are permitted to continue recording data, however if " +
+	    			"to iSENSE and provide a valid Experiment ID.  You are permitted to continue recording data; however if " +
 	    			"you choose to do so, you will not be able to upload the previous data set to iSENSE afterwards.")
 	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 	    		public void onClick(DialogInterface dialoginterface,int i) {
 	    			dialoginterface.dismiss();
+	    			if( !choiceViaMenu ) showDialog(DIALOG_SUMMARY);
 	    		}
 	    	})
      	   .setCancelable(true);
