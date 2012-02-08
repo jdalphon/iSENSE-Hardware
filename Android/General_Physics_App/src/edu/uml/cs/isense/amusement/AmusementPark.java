@@ -59,6 +59,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.MediaStore;
@@ -80,9 +81,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import edu.uml.cs.isense.comm.RestAPI;
-import edu.uml.cs.isense.amusement.R;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
 	
@@ -121,6 +120,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private static final int DIALOG_CHOICE = 6;
 	private static final int EXPERIMENT_CODE = 7;
 	private static final int DIALOG_NO_ISENSE = 8;
+	private static final int RECORDING_STOPPED = 9;
 
 	static final public int DIALOG_CANCELED = 0;
 	static final public int DIALOG_OK = 1;
@@ -175,6 +175,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private static boolean canobieIsChecked  = true;
 	private static boolean canobieBackup     = true;
 	
+	private Handler mHandler;
+	private boolean throughHandler = false;
+	
 	File SDFile;
 	FileWriter gpxwriter;
     BufferedWriter out;
@@ -196,6 +199,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
         
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        
+        mHandler = new Handler();
         
         pictures = new ArrayList<File>();
         videos   = new ArrayList<File>();
@@ -240,11 +245,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						mSensorManager.unregisterListener(AmusementPark.this);
 						running = false;
 						startStop.setText("Hold to Start");
+						 
 						timeTimer.cancel();
 						count++;
 						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
 						choiceViaMenu = false;
-						showDialog(DIALOG_CHOICE);
+						if(throughHandler)
+							showDialog(RECORDING_STOPPED);
+						else
+							showDialog(DIALOG_CHOICE);
 						
 					} else {
 						
@@ -285,6 +294,14 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 								if(i >= 3000) {
 								
 									timeTimer.cancel();
+									
+									mHandler.post(new Runnable() {
+										@Override
+										public void run() {
+											throughHandler = true;
+											startStop.performLongClick();
+										}
+									});
 								
 								} else {
 								
@@ -713,6 +730,25 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    		}
 	    	})
      	   .setCancelable(true);
+	    	
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case RECORDING_STOPPED:
+	    	
+	    	throughHandler = false;
+	    	
+	    	builder.setTitle("Time Up")
+	    	.setMessage("You have been recording data for more than 10 minutes.  For the sake of memory, we have capped your maximum " +
+	    			"recording time at 10 minutes and have stopped recording for you.  Press OK to continue.")
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	    		public void onClick(DialogInterface dialoginterface,int i) {
+	    			dialoginterface.dismiss();
+	    			showDialog(DIALOG_CHOICE);
+	    		}
+	    	})
+     	   .setCancelable(false);
 	    	
 	    	dialog = builder.create();
 	    
