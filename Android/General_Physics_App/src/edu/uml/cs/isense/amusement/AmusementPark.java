@@ -260,6 +260,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						dataSet = new JSONArray();
 						elapsedMillis = 0; totalMillis    = 0;
 						len = 0; len2 = 0; dataPointCount = 0;
+						i   = 0;
 						beginWrite = true;
 						try {
 							Thread.sleep(100);
@@ -291,7 +292,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 								elapsedMillis += INTERVAL;
 								totalMillis = elapsedMillis;
 			
-								if(i >= 3000) {
+								if(i >= 14) {
 								
 									timeTimer.cancel();
 									
