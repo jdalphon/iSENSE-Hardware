@@ -85,103 +85,102 @@ import edu.uml.cs.isense.comm.RestAPI;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
 	
-    private EditText experimentInput;
-    private EditText seats;
-    private Spinner rides;
-    private Button startStop;
-    private Button browseButton;
-    private TextView values;
-    private Boolean running = false;
-    private TextView rideName;
-    private Vibrator vibrator;
-    private TextView picCount;
-    private TextView loginInfo;
-    private CheckBox canobieCheck;
-    
-    private String rideNameString = "NOT SET";
-    private String seatString = "1";
-    
-    private SensorManager mSensorManager;
-    private LocationManager mLocationManager;
-    
-    private Location loc;
-    private float accel[];
-    private float orientation[];
-    private Timer timeTimer;
-    private float rawAccel[];
-    private float rawMag[];
-    
-    private static final int INTERVAL = 200;
-    private static final int MENU_ITEM_SETUP = 1;
-    private static final int MENU_ITEM_LOGIN = 2;
-    private static final int MENU_ITEM_UPLOAD = 3;
-    private static final int SAVE_DATA = 4;
-    private static final int DIALOG_SUMMARY = 5;
-    private static final int DIALOG_CHOICE = 6;
-    private static final int EXPERIMENT_CODE = 7;
-    private static final int DIALOG_NO_ISENSE = 8;
-    private static final int RECORDING_STOPPED = 9;
+	private EditText experimentInput;
+	private EditText seats;
+	private Spinner rides;
+	private Button startStop;
+	private Button browseButton;
+	private TextView values;
+	private Boolean running = false;
+	private TextView rideName;
+	private Vibrator vibrator;
+	private TextView picCount;
+	private TextView loginInfo;
+	private CheckBox canobieCheck;
 	
-    static final public int DIALOG_CANCELED = 0;
-    static final public int DIALOG_OK = 1;
-    static final public int DIALOG_PICTURE = 2;
-    
-    static final public int CAMERA_PIC_REQUESTED = 1;
-    static final public int CAMERA_VID_REQUESTED = 2;
-    	
-    private int count = 0;
-    private String data;
-    
-    private Uri imageUri; 
-    private Uri videoUri;
-    
-    private MediaPlayer mMediaPlayer;
-    
-    private ArrayList<File> pictures;
-    private ArrayList<File> videos;
-    
-    private int    rideIndex      =  0 ;
-    private String studentNumber  = "1";
-    private int    elapsedMinutes =  0 ;
-    private int    elapsedSeconds =  0 ;
-    private int    elapsedMillis  =  0 ;
-    private int    totalMillis    =  0 ;
-    
-    private int dataPointCount = 0;
-    
-    private String dateString;
-    RestAPI rapi ;
-    
-    String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
-    DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
-    
-    int i = 0;  int len = 0; int len2 = 0;
-    
-    ProgressDialog dia;
-    double partialProg = 1.0;
-    
-    boolean successLogin = false;
-    
-    private EditText sessionName; 
-    String nameOfSession = "";
-    String partialSessionName = "";
-    
-    static boolean inPausedState     = false;
-    static boolean toastSuccess      = false;
-    static boolean useMenu           = true ;
-    static boolean beginWrite        = true ;
-    static boolean setupDone         = false;
-    static boolean choiceViaMenu     = false;
-    static boolean dontToastMeTwice  = false;
-    private static boolean canobieIsChecked  = true;
-    private static boolean canobieBackup     = true;
-    
-    private Handler mHandler;
-    private boolean throughHandler = false;
-    
-    File SDFile;
-    FileWriter gpxwriter;
-    BufferedWriter out;
+	private String rideNameString = "NOT SET";
+	private String seatString = "1";
+	
+	private SensorManager mSensorManager;
+	private LocationManager mLocationManager;
+	
+	private Location loc;
+	private float accel[];
+	private float orientation[];
+	private Timer timeTimer;
+	private float rawAccel[];
+	private float rawMag[];
+	
+	private static final int INTERVAL = 200;
+	private static final int MENU_ITEM_SETUP = 1;
+	private static final int MENU_ITEM_LOGIN = 2;
+	private static final int MENU_ITEM_UPLOAD = 3;
+	private static final int SAVE_DATA = 4;
+	private static final int DIALOG_SUMMARY = 5;
+	private static final int DIALOG_CHOICE = 6;
+	private static final int EXPERIMENT_CODE = 7;
+	private static final int DIALOG_NO_ISENSE = 8;
+	private static final int RECORDING_STOPPED = 9;
+
+	static final public int DIALOG_CANCELED = 0;
+	static final public int DIALOG_OK = 1;
+	static final public int DIALOG_PICTURE = 2;
+	
+	static final public int CAMERA_PIC_REQUESTED = 1;
+	static final public int CAMERA_VID_REQUESTED = 2;
+		
+	private int count = 0;
+	private String data;
+	
+	private Uri imageUri; 
+	private Uri videoUri;
+	
+	private MediaPlayer mMediaPlayer;
+	
+	private ArrayList<File> pictures;
+	private ArrayList<File> videos;
+	
+	private int    rideIndex      =  0 ;
+	private String studentNumber  = "1";
+	private int    elapsedMinutes =  0 ;
+	private int    elapsedSeconds =  0 ;
+	private int    elapsedMillis  =  0 ;
+	private int    totalMillis    =  0 ;
+	
+	private int dataPointCount = 0;
+	
+	private String dateString;
+	RestAPI rapi ;
+	
+	String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
+	DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
+	
+	int i = 0;  int len = 0; int len2 = 0;
+	
+	ProgressDialog dia;
+	double partialProg = 1.0;
+	
+	boolean successLogin = false;
+	
+	private EditText sessionName; 
+	String nameOfSession = "";
+	String partialSessionName = "";
+	
+	boolean inPausedState     = false;
+	boolean toastSuccess      = false;
+	boolean useMenu           = true ;
+	boolean beginWrite        = true ;
+	boolean setupDone         = false;
+	boolean choiceViaMenu     = false;
+	private static boolean canobieIsChecked  = true;
+	private static boolean canobieBackup     = true;
+	
+	private Handler mHandler;
+	private boolean throughHandler = false;
+	
+	File SDFile;
+	FileWriter gpxwriter;
+	BufferedWriter out;
     public static String textToSession = "";
     public static String toSendOut = "";
     public static String loginName = "";
@@ -293,7 +292,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 								elapsedMillis += INTERVAL;
 								totalMillis = elapsedMillis;
 			
-								if(i >= 3000) {
+								if(i >= 14) {
 								
 									timeTimer.cancel();
 									
@@ -480,15 +479,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	super.onResume();
     	inPausedState = false;
     }
-    
-    @Override
-    public void onBackPressed() {
-    	if(!dontToastMeTwice) {
-    		Toast.makeText(this, "Use the home button to exit the app instead.", Toast.LENGTH_SHORT).show();
-    		new NoToastTwiceTask().execute();
-    	}
-    }
-
 
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -1068,22 +1058,5 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	        
 	    }
 	}	
-	
-	private class NoToastTwiceTask extends AsyncTask <Void, Integer, Void> {
-	    @Override protected void onPreExecute() {
-	    	dontToastMeTwice = true;
-	    }
-		@Override protected Void doInBackground(Void... voids) {
-	    	try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-	        return null;
-		}
-	    @Override  protected void onPostExecute(Void voids) {
-	    	dontToastMeTwice = false;
-	    }
-	}
 
 }
