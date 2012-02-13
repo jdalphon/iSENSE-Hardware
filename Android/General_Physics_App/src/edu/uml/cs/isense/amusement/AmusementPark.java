@@ -63,6 +63,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
@@ -121,6 +122,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private static final int EXPERIMENT_CODE = 7;
 	private static final int DIALOG_NO_ISENSE = 8;
 	private static final int RECORDING_STOPPED = 9;
+	private static final int DIALOG_NO_GPS = 10;
 
 	static final public int DIALOG_CANCELED = 0;
 	static final public int DIALOG_OK = 1;
@@ -270,14 +272,16 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						}
 
 						useMenu = false;
-					
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
-								SensorManager.SENSOR_DELAY_FASTEST);
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-								SensorManager.SENSOR_DELAY_FASTEST);
-					
+						
+						if (mSensorManager != null) {
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
+									SensorManager.SENSOR_DELAY_FASTEST);
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+									SensorManager.SENSOR_DELAY_FASTEST);
+						}
+						
 						data = "X Acceleration, Y Acceleration, Z Acceleration, Acceleration, " +
 								"Latitude, Longitude, Heading, Magnetic X, Magnetic Y, Magnetic Z, Time\n";
 						running = true;
@@ -367,12 +371,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        
+                      
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         
-        /* this will cause a problem if location manager returns null*/
-        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        	mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        else {
+        	showDialog(DIALOG_NO_GPS);
+        }
         
         accel       = new float[4];
         orientation = new float[3];
@@ -751,6 +758,26 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	})
      	   .setCancelable(false);
 	    	
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_NO_GPS:
+	    	
+	    	builder.setTitle("No GPS Provider Found")
+	    	.setMessage("Enabling GPS satellites is recommended for this application.  Would you like to enable GPS?")
+	    	.setCancelable(false)
+	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	               public void onClick(final DialogInterface dialog, final int id) {
+	            	   startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+	               }
+	           })
+	           .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	               public void onClick(final DialogInterface dialog, final int id) {
+	                    dialog.cancel();
+	               }
+	           });
+
 	    	dialog = builder.create();
 	    
 	    	break;
