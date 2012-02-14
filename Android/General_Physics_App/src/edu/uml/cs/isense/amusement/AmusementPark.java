@@ -123,6 +123,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private static final int DIALOG_NO_ISENSE = 8;
 	private static final int RECORDING_STOPPED = 9;
 	private static final int DIALOG_NO_GPS = 10;
+	private static final int DIALOG_FORCE_STOP = 11;
 
     static final public int DIALOG_CANCELED = 0;
     static final public int DIALOG_OK = 1;
@@ -486,6 +487,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public void onResume() {
     	super.onResume();
     	inPausedState = false;
+    	if(running)
+    		showDialog(DIALOG_FORCE_STOP);
+    		
     }
     
     @Override
@@ -778,16 +782,33 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	.setMessage("Enabling GPS satellites is recommended for this application.  Would you like to enable GPS?")
 	    	.setCancelable(false)
 	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	               public void onClick(final DialogInterface dialog, final int id) {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.cancel();
 	            	   startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
 	               }
 	           })
 	           .setNegativeButton("No", new DialogInterface.OnClickListener() {
-	               public void onClick(final DialogInterface dialog, final int id) {
-	                    dialog.cancel();
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	                    dialoginterface.cancel();
 	               }
 	           });
 
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_FORCE_STOP:
+	    	
+	    	builder.setTitle("Data Recording Halted")
+	    	.setMessage("You exited the app while data was still being recorded.  Data has stopped recording.")
+	    	.setCancelable(false)
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   startStop.performLongClick();
+	               }
+	         });
+	           
 	    	dialog = builder.create();
 	    
 	    	break;
