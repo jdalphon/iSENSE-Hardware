@@ -63,6 +63,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
@@ -85,6 +86,7 @@ import edu.uml.cs.isense.comm.RestAPI;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
 	
+<<<<<<< HEAD
     private EditText experimentInput;
     private EditText seats;
     private Spinner rides;
@@ -121,6 +123,101 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     private static final int EXPERIMENT_CODE = 7;
     private static final int DIALOG_NO_ISENSE = 8;
     private static final int RECORDING_STOPPED = 9;
+=======
+	private EditText experimentInput;
+	private EditText seats;
+	private Spinner rides;
+	private Button startStop;
+	private Button browseButton;
+	private TextView values;
+	private Boolean running = false;
+	private TextView rideName;
+	private Vibrator vibrator;
+	private TextView picCount;
+	private TextView loginInfo;
+	private CheckBox canobieCheck;
+	
+	private String rideNameString = "NOT SET";
+	private String seatString = "1";
+	
+	private SensorManager mSensorManager;
+	private LocationManager mLocationManager;
+	
+	private Location loc;
+	private float accel[];
+	private float orientation[];
+	private Timer timeTimer;
+	private float rawAccel[];
+	private float rawMag[];
+	
+	private static final int INTERVAL = 200;
+	private static final int MENU_ITEM_SETUP = 1;
+	private static final int MENU_ITEM_LOGIN = 2;
+	private static final int MENU_ITEM_UPLOAD = 3;
+	private static final int SAVE_DATA = 4;
+	private static final int DIALOG_SUMMARY = 5;
+	private static final int DIALOG_CHOICE = 6;
+	private static final int EXPERIMENT_CODE = 7;
+	private static final int DIALOG_NO_ISENSE = 8;
+	private static final int RECORDING_STOPPED = 9;
+	private static final int DIALOG_NO_GPS = 10;
+
+	static final public int DIALOG_CANCELED = 0;
+	static final public int DIALOG_OK = 1;
+	static final public int DIALOG_PICTURE = 2;
+	
+	static final public int CAMERA_PIC_REQUESTED = 1;
+	static final public int CAMERA_VID_REQUESTED = 2;
+		
+	private int count = 0;
+	private String data;
+	
+	private Uri imageUri; 
+	private Uri videoUri;
+	
+	private MediaPlayer mMediaPlayer;
+	
+	private ArrayList<File> pictures;
+	private ArrayList<File> videos;
+	
+	private int    rideIndex      =  0 ;
+	private String studentNumber  = "1";
+	private int    elapsedMinutes =  0 ;
+	private int    elapsedSeconds =  0 ;
+	private int    elapsedMillis  =  0 ;
+	private int    totalMillis    =  0 ;
+	
+	private int dataPointCount = 0;
+	
+	private String dateString;
+	RestAPI rapi ;
+	
+	String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
+	DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
+	
+	int i = 0;  int len = 0; int len2 = 0;
+	
+	ProgressDialog dia;
+	double partialProg = 1.0;
+	
+	boolean successLogin = false;
+	
+	private EditText sessionName; 
+	String nameOfSession = "";
+	String partialSessionName = "";
+	
+	boolean inPausedState     = false;
+	boolean toastSuccess      = false;
+	boolean useMenu           = true ;
+	boolean beginWrite        = true ;
+	boolean setupDone         = false;
+	boolean choiceViaMenu     = false;
+	private static boolean canobieIsChecked  = true;
+	private static boolean canobieBackup     = true;
+	
+	private Handler mHandler;
+	private boolean throughHandler = false;
+>>>>>>> 5e3d48302c15b276b891bc154cbb1275c0a7403f
 	
     static final public int DIALOG_CANCELED = 0;
     static final public int DIALOG_OK = 1;
@@ -271,14 +368,16 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						}
 
 						useMenu = false;
-					
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
-								SensorManager.SENSOR_DELAY_FASTEST);
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-								SensorManager.SENSOR_DELAY_FASTEST);
-					
+						
+						if (mSensorManager != null) {
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
+									SensorManager.SENSOR_DELAY_FASTEST);
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+									SensorManager.SENSOR_DELAY_FASTEST);
+						}
+						
 						data = "X Acceleration, Y Acceleration, Z Acceleration, Acceleration, " +
 								"Latitude, Longitude, Heading, Magnetic X, Magnetic Y, Magnetic Z, Time\n";
 						running = true;
@@ -368,12 +467,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        
+                      
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         
-        /* this will cause a problem if location manager returns null*/
-        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        	mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        else {
+        	showDialog(DIALOG_NO_GPS);
+        }
         
         accel       = new float[4];
         orientation = new float[3];
@@ -761,6 +863,26 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	})
      	   .setCancelable(false);
 	    	
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_NO_GPS:
+	    	
+	    	builder.setTitle("No GPS Provider Found")
+	    	.setMessage("Enabling GPS satellites is recommended for this application.  Would you like to enable GPS?")
+	    	.setCancelable(false)
+	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	               public void onClick(final DialogInterface dialog, final int id) {
+	            	   startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+	               }
+	           })
+	           .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	               public void onClick(final DialogInterface dialog, final int id) {
+	                    dialog.cancel();
+	               }
+	           });
+
 	    	dialog = builder.create();
 	    
 	    	break;
