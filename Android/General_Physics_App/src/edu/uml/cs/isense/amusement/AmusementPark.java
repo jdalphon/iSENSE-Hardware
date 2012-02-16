@@ -934,14 +934,27 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues values = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
+					
+					ContentValues values = new ContentValues();
+					
+					imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+					Log.e("Uri", "imageUri: " + imageUri); //honk
+					
+					Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+					intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intent, CAMERA_PIC_REQUESTED);
 				
-				imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+				} else {
+					Toast.makeText(AmusementPark.this, 
+							"Permission isn't granted to write to external storage.  Please enable to take pictures.", 
+							Toast.LENGTH_LONG).show();
+					new NoToastTwiceTask().execute(Toast.LENGTH_LONG);
+				}
 				
-				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-				intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intent, CAMERA_PIC_REQUESTED);
+				
 			}
 			
 		});
@@ -952,14 +965,25 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues valuesVideos = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
 				
-				videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					ContentValues valuesVideos = new ContentValues();
 				
-				Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-				intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-				intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					Log.e("Uri", "videoUri: " + videoUri); //honk
+				
+					Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+					intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+					intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					
+				} else {
+					Toast.makeText(AmusementPark.this, 
+							"Permission isn't granted to write to external storage.  Please enable to record videos.", 
+							Toast.LENGTH_LONG).show();
+					new NoToastTwiceTask().execute(Toast.LENGTH_LONG);
+				}
 			}
 		});
        
@@ -1126,13 +1150,16 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    }
 	}	
 	
-	private class NoToastTwiceTask extends AsyncTask <Void, Integer, Void> {
+	private class NoToastTwiceTask extends AsyncTask <Integer, Integer, Void> {
 	    @Override protected void onPreExecute() {
 	    	dontToastMeTwice = true;
 	    }
-		@Override protected Void doInBackground(Void... voids) {
+		@Override protected Void doInBackground(Integer...time) {
 	    	try {
-				Thread.sleep(2000);
+	    		if(time[0] == Toast.LENGTH_SHORT || time[0] == Toast.LENGTH_LONG)
+	    			Thread.sleep(time[0]);
+	    		else
+	    			Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
