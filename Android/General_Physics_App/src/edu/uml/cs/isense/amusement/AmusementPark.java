@@ -188,6 +188,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
+    private ConnectivityManager connectivityManager;
 	
 	
     @Override
@@ -200,7 +201,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
         
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         mHandler = new Handler();
         
@@ -832,6 +833,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
+    	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
                 
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -878,11 +880,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			
 			@Override
 			public void onClick(View v) {
-
-				Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
-				experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
 				
-				startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+				if(!rapi.isConnectedToInternet()) {
+					Toast.makeText(AmusementPark.this, "You must enable wifi or mobile connectivity to do this.", Toast.LENGTH_SHORT).show();	
+				} else {
+				
+					Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
+					experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
+				
+					Log.w("JSON", "EXPERIMENT_CODE: " + EXPERIMENT_CODE); //honk
+				
+					startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+				}
 				
 			}
 			

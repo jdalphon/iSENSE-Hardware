@@ -405,12 +405,15 @@ public class RestAPI {
 				
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			}
 			
@@ -737,8 +740,9 @@ public class RestAPI {
 		
 		if (connectivityManager != null && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
 			try {
+				Log.w("JSON", "url: " + url); //honk
 				String data = makeRequest(url);
-			
+				Log.w("JSON", "data: " + data); //honk
 				// Parse JSON Result
 				Log.w("JSON", "Data ="+data);
 				JSONObject o = new JSONObject(data);
@@ -1209,6 +1213,13 @@ public class RestAPI {
 	
 	public String makeRequest(String target) throws Exception {
 		
+		
+/* honk */	
+		Log.w("JSON", "Connectivy?     = " + connectivityManager);
+		Log.w("JSON", "Connect Wifi?   = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected());
+		Log.w("JSON", "Connect Mobile? = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected());
+/*endhonk*/		
+		
 		String output = "{}";
 		
 		String data = target.replace(" ", "+");
@@ -1223,7 +1234,7 @@ public class RestAPI {
 		
 		// Get the status code of the HTTP Request so we can figure out what to do next
 		int status = conn.getResponseCode();
-		
+		Log.w("JSON", "status: " + status); //honk
 		switch(status) {
 								
 			case 200:
@@ -1237,10 +1248,11 @@ public class RestAPI {
 				// Loop through response to build JSON String
 				while((line = br.readLine()) != null) {
 					sb.append(line + "\n");
+					Log.w("JSON", "br line: " + line); //honk
 				}
 			
 				// Set output from response
-				output = sb.toString();				
+				output = sb.toString();		Log.w("JSON", "output: " + output); //honk		
 				break;
 			
 			case 404:
@@ -1255,6 +1267,19 @@ public class RestAPI {
 		}
 		
 		return output;
+	}
+	
+	public boolean isConnectedToInternet() {
+		
+		Log.e("cnctn", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()); //honk
+		Log.e("cnctn", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()); //honk
+		
+		if(((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
+				((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }
