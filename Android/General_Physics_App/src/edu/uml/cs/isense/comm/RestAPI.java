@@ -405,12 +405,15 @@ public class RestAPI {
 				
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			}
 			
@@ -1262,6 +1265,19 @@ public class RestAPI {
 		}
 		
 		return output;
+	}
+	
+	public boolean isConnectedToInternet() {
+		
+		Log.e("cnctn", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()); //honk
+		Log.e("cnctn", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()); //honk
+		
+		if(((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
+				((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }

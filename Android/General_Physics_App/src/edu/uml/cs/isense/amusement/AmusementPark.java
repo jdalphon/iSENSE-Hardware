@@ -190,6 +190,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
+    private ConnectivityManager connectivityManager;
 	
 	
     @Override
@@ -881,14 +882,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			
 			@Override
 			public void onClick(View v) {
-				Log.w("JSON", "browse clicked!"); //honk
 				
-				Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
-				experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
+				if(!rapi.isConnectedToInternet()) {
+					Toast.makeText(AmusementPark.this, "You must enable wifi or mobile connectivity to do this.", Toast.LENGTH_SHORT).show();	
+				} else {
 				
-				Log.w("JSON", "EXPERIMENT_CODE: " + EXPERIMENT_CODE); //honk
+					Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
+					experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
 				
-				startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+					Log.w("JSON", "EXPERIMENT_CODE: " + EXPERIMENT_CODE); //honk
+				
+					startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+				}
 				
 			}
 			
