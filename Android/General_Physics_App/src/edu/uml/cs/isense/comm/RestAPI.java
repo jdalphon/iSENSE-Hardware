@@ -740,8 +740,10 @@ public class RestAPI {
 				String data = makeRequest(url);
 			
 				// Parse JSON Result
+				Log.w("JSON", "Data ="+data);
 				JSONObject o = new JSONObject(data);
 				JSONArray a = o.getJSONArray("data");
+				
 						
 				int length = a.length();
 				if (action.toLowerCase().compareTo("browse") == 0) mDbHelper.open();
