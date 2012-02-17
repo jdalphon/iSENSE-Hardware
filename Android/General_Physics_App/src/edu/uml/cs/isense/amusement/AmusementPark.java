@@ -77,6 +77,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -188,6 +189,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 68b4fbeb66836caba5d0c8616eec02f134b16066
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -833,9 +838,11 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
+    	
+    	ScrollView setup = (ScrollView) findViewById(R.id.setupScroll);
                 
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = vi.inflate(R.layout.setup, null);
+		View v = vi.inflate(R.layout.setup, setup, false);
 		
         builder.setView(v);
         
@@ -930,14 +937,29 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues values = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
+					
+					ContentValues values = new ContentValues();
+					
+					imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+					Log.e("Uri", "imageUri: " + imageUri); //honk
+					
+					Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+					intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intent, CAMERA_PIC_REQUESTED);
 				
-				imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+				} else {
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to take pictures.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
+				}
 				
-				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-				intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intent, CAMERA_PIC_REQUESTED);
+				
 			}
 			
 		});
@@ -948,14 +970,27 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues valuesVideos = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
 				
-				videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					ContentValues valuesVideos = new ContentValues();
 				
-				Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-				intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-				intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					Log.e("Uri", "videoUri: " + videoUri); //honk
+				
+					Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+					intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+					intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					
+				} else {
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to record videos.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
+				}
 			}
 		});
        
@@ -1128,7 +1163,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    }
 		@Override protected Void doInBackground(Void... voids) {
 	    	try {
-				Thread.sleep(2000);
+				Thread.sleep(3500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
