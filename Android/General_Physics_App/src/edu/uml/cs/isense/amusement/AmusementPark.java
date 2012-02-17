@@ -40,7 +40,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -65,6 +64,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -188,8 +188,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
-    private ConnectivityManager connectivityManager;
-	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
