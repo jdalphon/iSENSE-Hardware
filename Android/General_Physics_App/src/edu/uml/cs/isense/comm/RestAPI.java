@@ -1267,6 +1267,9 @@ public class RestAPI {
 		return output;
 	}
 	
+	/*
+	 *  Additional method by Mike S.
+	 */
 	public boolean isConnectedToInternet() {
 		
 		Log.e("cnctn", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()); //honk

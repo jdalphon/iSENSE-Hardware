@@ -79,6 +79,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -190,7 +191,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
-    private ConnectivityManager connectivityManager;
 	
 	
     @Override
@@ -837,9 +837,11 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
+    	
+    	ScrollView setup = (ScrollView) findViewById(R.id.setupScroll);
                 
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = vi.inflate(R.layout.setup, null);
+		View v = vi.inflate(R.layout.setup, setup, false);
 		
         builder.setView(v);
         
@@ -948,10 +950,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 					startActivityForResult(intent, CAMERA_PIC_REQUESTED);
 				
 				} else {
-					Toast.makeText(AmusementPark.this, 
-							"Permission isn't granted to write to external storage.  Please enable to take pictures.", 
-							Toast.LENGTH_LONG).show();
-					new NoToastTwiceTask().execute(Toast.LENGTH_LONG);
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to take pictures.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
 				}
 				
 				
@@ -979,10 +983,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 					startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
 					
 				} else {
-					Toast.makeText(AmusementPark.this, 
-							"Permission isn't granted to write to external storage.  Please enable to record videos.", 
-							Toast.LENGTH_LONG).show();
-					new NoToastTwiceTask().execute(Toast.LENGTH_LONG);
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to record videos.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
 				}
 			}
 		});
@@ -1150,16 +1156,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    }
 	}	
 	
-	private class NoToastTwiceTask extends AsyncTask <Integer, Integer, Void> {
+	private class NoToastTwiceTask extends AsyncTask <Void, Integer, Void> {
 	    @Override protected void onPreExecute() {
 	    	dontToastMeTwice = true;
 	    }
-		@Override protected Void doInBackground(Integer...time) {
+		@Override protected Void doInBackground(Void... voids) {
 	    	try {
-	    		if(time[0] == Toast.LENGTH_SHORT || time[0] == Toast.LENGTH_LONG)
-	    			Thread.sleep(time[0]);
-	    		else
-	    			Thread.sleep(2000);
+				Thread.sleep(3500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
