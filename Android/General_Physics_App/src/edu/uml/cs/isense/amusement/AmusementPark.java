@@ -81,6 +81,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.uml.cs.isense.amusement.R.layout;
 import edu.uml.cs.isense.comm.RestAPI;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
@@ -189,10 +190,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
-<<<<<<< HEAD
-=======
-	
->>>>>>> 68b4fbeb66836caba5d0c8616eec02f134b16066
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -839,10 +837,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
     	
-    	ScrollView setup = (ScrollView) findViewById(R.id.setupScroll);
-                
+    	     
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = vi.inflate(R.layout.setup, setup, false);
+		View v = vi.inflate(R.layout.setup, null);
 		
         builder.setView(v);
         
