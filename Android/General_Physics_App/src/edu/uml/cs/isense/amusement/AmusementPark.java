@@ -79,7 +79,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -177,6 +176,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     static boolean setupDone         = false;
     static boolean choiceViaMenu     = false;
     static boolean dontToastMeTwice  = false;
+    static boolean exitAppViaBack    = false;
     private static boolean canobieIsChecked  = true;
     private static boolean canobieBackup     = true;
     
@@ -496,8 +496,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     @Override
     public void onBackPressed() {
     	if(!dontToastMeTwice) {
-    		Toast.makeText(this, "Use the home button to exit the app instead.", Toast.LENGTH_SHORT).show();
+    		Toast.makeText(this, "Press back again to exit (unless recording data).", Toast.LENGTH_SHORT).show();
     		new NoToastTwiceTask().execute();
+    	} else if(exitAppViaBack && !running) {
+    		super.onBackPressed();	
     	}
     }
 
@@ -837,11 +839,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
-    	
-    	ScrollView setup = (ScrollView) findViewById(R.id.setupScroll);
-                
+    	        
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = vi.inflate(R.layout.setup, setup, false);
+		View v = vi.inflate(R.layout.setup, null);
 		
         builder.setView(v);
         
@@ -1159,11 +1159,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private class NoToastTwiceTask extends AsyncTask <Void, Integer, Void> {
 	    @Override protected void onPreExecute() {
 	    	dontToastMeTwice = true;
+	    	exitAppViaBack   = true;
 	    }
 		@Override protected Void doInBackground(Void... voids) {
 	    	try {
-				Thread.sleep(3500);
+	    		Thread.sleep(1500);
+	    		exitAppViaBack = false;
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
+				exitAppViaBack = false;
 				e.printStackTrace();
 			}
 	        return null;
