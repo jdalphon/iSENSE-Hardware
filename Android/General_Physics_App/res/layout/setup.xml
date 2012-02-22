@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/setupScroll"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content">
+	android:layout_height="fill_parent">
 <LinearLayout 
 	android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:scrollbars="vertical" >
     
@@ -21,7 +22,7 @@
     
     <RelativeLayout android:orientation="vertical"
     	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
+    	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
     	<TextView android:layout_height="wrap_content" 
@@ -33,9 +34,10 @@
 			android:paddingTop="12dip"/>
 		<EditText android:text=""
 			android:layout_width="fill_parent" 
-			android:inputType="text" 
+			android:inputType="text"
 			android:id="@+id/sessionName" 
 			android:maxLength="50"
+			android:imeOptions="actionDone"
 			android:layout_height="wrap_content" 
 			android:layout_alignParentTop="true" 
 			android:layout_toRightOf="@+id/nameLabel">
@@ -45,7 +47,7 @@
 	</RelativeLayout>
 	
 	<RelativeLayout android:orientation="vertical" 
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:background="@android:color/white"
 		android:paddingBottom="5dp">
@@ -64,7 +66,6 @@
 			android:layout_toRightOf="@id/ExperimentLabel"
 			android:inputType="phone"
 			android:digits="1234567890"
-			android:singleLine="true"
 			android:layout_height="wrap_content"/>
 		
 		<Button android:layout_height="wrap_content" 
@@ -89,7 +90,7 @@
 
 	<RelativeLayout android:orientation="vertical"
     	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
+    	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
     	<TextView android:layout_height="wrap_content" 
@@ -104,7 +105,7 @@
 			android:layout_width="fill_parent" 
 			android:inputType="phone"
 			android:digits="1234567890"
-			android:singleLine="true"
+			android:imeOptions="actionDone"
 			android:maxLength="12"
 			android:id="@+id/studentNumber" 
 			android:layout_height="wrap_content" 
@@ -116,7 +117,7 @@
 	
 	<RelativeLayout android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:background="@android:color/white">
        
         <CheckBox android:layout_height="wrap_content"
@@ -149,7 +150,7 @@
         
     <LinearLayout android:orientation="horizontal"
     	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
+    	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
     	<Button
