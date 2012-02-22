@@ -1,4 +1,4 @@
-/**honk*********************************************************************************************/
+/***************************************************************************************************/
 /***************************************************************************************************/
 /**                                                                                               **/
 /**      IIIIIIIIIIIII            General Purpose Amusement Park App             SSSSSSSSS        **/
@@ -63,6 +63,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
@@ -84,44 +85,46 @@ import android.widget.Toast;
 import edu.uml.cs.isense.comm.RestAPI;
 
 public class AmusementPark extends Activity implements SensorEventListener, LocationListener {
+
+	private EditText experimentInput;
+	private EditText seats;
+	private Spinner rides;
+	private Button startStop;
+	private Button browseButton;
+	private TextView values;
+	private Boolean running = false;
+	private TextView rideName;
+	private Vibrator vibrator;
+	private TextView picCount;
+	private TextView loginInfo;
+	private CheckBox canobieCheck;
 	
-    private EditText experimentInput;
-    private EditText seats;
-    private Spinner rides;
-    private Button startStop;
-    private Button browseButton;
-    private TextView values;
-    private Boolean running = false;
-    private TextView rideName;
-    private Vibrator vibrator;
-    private TextView picCount;
-    private TextView loginInfo;
-    private CheckBox canobieCheck;
-    
-    private String rideNameString = "NOT SET";
-    private String seatString = "1";
-    
-    private SensorManager mSensorManager;
-    private LocationManager mLocationManager;
-    
-    private Location loc;
-    private float accel[];
-    private float orientation[];
-    private Timer timeTimer;
-    private float rawAccel[];
-    private float rawMag[];
-    
-    private static final int INTERVAL = 200;
-    private static final int MENU_ITEM_SETUP = 1;
-    private static final int MENU_ITEM_LOGIN = 2;
-    private static final int MENU_ITEM_UPLOAD = 3;
-    private static final int SAVE_DATA = 4;
-    private static final int DIALOG_SUMMARY = 5;
-    private static final int DIALOG_CHOICE = 6;
-    private static final int EXPERIMENT_CODE = 7;
-    private static final int DIALOG_NO_ISENSE = 8;
-    private static final int RECORDING_STOPPED = 9;
+	private String rideNameString = "NOT SET";
+	private String seatString = "1";
 	
+	private SensorManager mSensorManager;
+	private LocationManager mLocationManager;
+	
+	private Location loc;
+	private float accel[];
+	private float orientation[];
+	private Timer timeTimer;
+	private float rawAccel[];
+	private float rawMag[];
+	
+	private static final int INTERVAL = 200;
+	private static final int MENU_ITEM_SETUP = 1;
+	private static final int MENU_ITEM_LOGIN = 2;
+	private static final int MENU_ITEM_UPLOAD = 3;
+	private static final int SAVE_DATA = 4;
+	private static final int DIALOG_SUMMARY = 5;
+	private static final int DIALOG_CHOICE = 6;
+	private static final int EXPERIMENT_CODE = 7;
+	private static final int DIALOG_NO_ISENSE = 8;
+	private static final int RECORDING_STOPPED = 9;
+	private static final int DIALOG_NO_GPS = 10;
+	private static final int DIALOG_FORCE_STOP = 11;
+
     static final public int DIALOG_CANCELED = 0;
     static final public int DIALOG_OK = 1;
     static final public int DIALOG_PICTURE = 2;
@@ -173,6 +176,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     static boolean setupDone         = false;
     static boolean choiceViaMenu     = false;
     static boolean dontToastMeTwice  = false;
+    static boolean exitAppViaBack    = false;
     private static boolean canobieIsChecked  = true;
     private static boolean canobieBackup     = true;
     
@@ -199,7 +203,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
         
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         mHandler = new Handler();
         
@@ -271,14 +275,16 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						}
 
 						useMenu = false;
-					
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
-								SensorManager.SENSOR_DELAY_FASTEST);
-						mSensorManager.registerListener(AmusementPark.this, 
-								mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-								SensorManager.SENSOR_DELAY_FASTEST);
-					
+						
+						if (mSensorManager != null) {
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),  
+									SensorManager.SENSOR_DELAY_FASTEST);
+							mSensorManager.registerListener(AmusementPark.this, 
+									mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+									SensorManager.SENSOR_DELAY_FASTEST);
+						}
+						
 						data = "X Acceleration, Y Acceleration, Z Acceleration, Acceleration, " +
 								"Latitude, Longitude, Heading, Magnetic X, Magnetic Y, Magnetic Z, Time\n";
 						running = true;
@@ -368,12 +374,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        
+                      
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         
-        /* this will cause a problem if location manager returns null*/
-        mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        	mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
+        else {
+        	showDialog(DIALOG_NO_GPS);
+        }
         
         accel       = new float[4];
         orientation = new float[3];
@@ -479,16 +488,20 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public void onResume() {
     	super.onResume();
     	inPausedState = false;
+    	if(running)
+    		showDialog(DIALOG_FORCE_STOP);
+    		
     }
     
     @Override
     public void onBackPressed() {
     	if(!dontToastMeTwice) {
-    		Toast.makeText(this, "Use the home button to exit the app instead.", Toast.LENGTH_SHORT).show();
+    		Toast.makeText(this, "Press back again to exit (unless recording data).", Toast.LENGTH_SHORT).show();
     		new NoToastTwiceTask().execute();
+    	} else if(exitAppViaBack && !running) {
+    		super.onBackPressed();	
     	}
     }
-
 
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -765,6 +778,43 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    	break;
 	    	
+	    case DIALOG_NO_GPS:
+	    	
+	    	builder.setTitle("No GPS Provider Found")
+	    	.setMessage("Enabling GPS satellites is recommended for this application.  Would you like to enable GPS?")
+	    	.setCancelable(false)
+	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.cancel();
+	            	   startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+	               }
+	           })
+	           .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	                    dialoginterface.cancel();
+	               }
+	           });
+
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_FORCE_STOP:
+	    	
+	    	builder.setTitle("Data Recording Halted")
+	    	.setMessage("You exited the app while data was still being recorded.  Data has stopped recording.")
+	    	.setCancelable(false)
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   startStop.performLongClick();
+	               }
+	         });
+	           
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
 	    default:
 	    	dialog = null;
 	    	break;
@@ -786,8 +836,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
+    	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
-                
+    	        
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = vi.inflate(R.layout.setup, null);
 		
@@ -832,11 +883,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			
 			@Override
 			public void onClick(View v) {
-
-				Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
-				experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
 				
-				startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+				if(!rapi.isConnectedToInternet()) {
+					Toast.makeText(AmusementPark.this, "You must enable wifi or mobile connectivity to do this.", Toast.LENGTH_SHORT).show();	
+				} else {
+				
+					Intent experimentIntent = new Intent(getApplicationContext(), Experiments.class);
+					experimentIntent.putExtra("edu.uml.cs.isense.amusement.experiments.propose", EXPERIMENT_CODE);
+				
+					Log.w("JSON", "EXPERIMENT_CODE: " + EXPERIMENT_CODE); //honk
+				
+					startActivityForResult(experimentIntent, EXPERIMENT_CODE);
+				}
 				
 			}
 			
@@ -877,14 +935,29 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues values = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
+					
+					ContentValues values = new ContentValues();
+					
+					imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+					Log.e("Uri", "imageUri: " + imageUri); //honk
+					
+					Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+					intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intent, CAMERA_PIC_REQUESTED);
 				
-				imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+				} else {
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to take pictures.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
+				}
 				
-				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-				intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intent, CAMERA_PIC_REQUESTED);
+				
 			}
 			
 		});
@@ -895,14 +968,27 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			@Override
 			public void onClick(View v) {
 				
-				ContentValues valuesVideos = new ContentValues();
+				String state = Environment.getExternalStorageState();
+				if (Environment.MEDIA_MOUNTED.equals(state)) {
 				
-				videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					ContentValues valuesVideos = new ContentValues();
 				
-				Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-				intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-				intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					videoUri = getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesVideos);
+					Log.e("Uri", "videoUri: " + videoUri); //honk
+				
+					Intent intentVid = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+					intentVid.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+					intentVid.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+					startActivityForResult(intentVid, CAMERA_VID_REQUESTED);
+					
+				} else {
+					if(!dontToastMeTwice) {
+						Toast.makeText(AmusementPark.this, 
+								"Permission isn't granted to write to external storage.  Please enable to record videos.", 
+								Toast.LENGTH_LONG).show();
+						new NoToastTwiceTask().execute();
+					}
+				}
 			}
 		});
        
@@ -1072,11 +1158,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	private class NoToastTwiceTask extends AsyncTask <Void, Integer, Void> {
 	    @Override protected void onPreExecute() {
 	    	dontToastMeTwice = true;
+	    	exitAppViaBack   = true;
 	    }
 		@Override protected Void doInBackground(Void... voids) {
 	    	try {
+	    		Thread.sleep(1500);
+	    		exitAppViaBack = false;
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
+				exitAppViaBack = false;
 				e.printStackTrace();
 			}
 	        return null;
