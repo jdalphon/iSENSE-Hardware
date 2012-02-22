@@ -48,6 +48,8 @@ public class RestAPI {
 	private int uid;
 	private JSONArray dataCache;
 	
+	public static String connection = "";
+	
 	protected RestAPI() {
 
     }
@@ -380,12 +382,15 @@ public class RestAPI {
 	public Boolean login(String username, String password) {
 		String url = "method=login&username=" + URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password);
 		
-/*		if(!(connectivityManager != null)) Log.e(null, "FAIL 1: No connectivity manager");
-		if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) Log.e(null, "FAIL 2: No wifi");
-		if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) Log.e(null, "FAIL 3: No 3G");
-	*/	
+		/*if((!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
+				(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) 
+			connection = "NONE";
+		else
+			connection = "";
+		*/
 		if (connectivityManager != null && ( connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) {
 			try {
+				connection = "";
 				String data = makeRequest(url);
 				
 				// Parse JSON Result
@@ -400,17 +405,21 @@ public class RestAPI {
 				
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
+				connection = "NONE";
 				return false;
 			}
 			
 			return true;
 		}
+		connection = "NONE";
 		return false;
 	}
 	
@@ -731,8 +740,9 @@ public class RestAPI {
 		
 		if (connectivityManager != null && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
 			try {
+				Log.w("JSON", "url: " + url); //honk
 				String data = makeRequest(url);
-			
+				Log.w("JSON", "data: " + data); //honk
 				// Parse JSON Result
 				JSONObject o = new JSONObject(data);
 				JSONArray a = o.getJSONArray("data");
@@ -1201,6 +1211,13 @@ public class RestAPI {
 	
 	public String makeRequest(String target) throws Exception {
 		
+		
+/* honk */	
+		Log.w("JSON", "Connectivy?     = " + connectivityManager);
+		Log.w("JSON", "Connect Wifi?   = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected());
+		Log.w("JSON", "Connect Mobile? = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected());
+/*endhonk*/		
+		
 		String output = "{}";
 		
 		String data = target.replace(" ", "+");
@@ -1215,7 +1232,7 @@ public class RestAPI {
 		
 		// Get the status code of the HTTP Request so we can figure out what to do next
 		int status = conn.getResponseCode();
-		
+		Log.w("JSON", "status: " + status); //honk
 		switch(status) {
 								
 			case 200:
@@ -1229,10 +1246,11 @@ public class RestAPI {
 				// Loop through response to build JSON String
 				while((line = br.readLine()) != null) {
 					sb.append(line + "\n");
+					Log.w("JSON", "br line: " + line); //honk
 				}
 			
 				// Set output from response
-				output = sb.toString();				
+				output = sb.toString();		Log.w("JSON", "output: " + output); //honk		
 				break;
 			
 			case 404:
@@ -1247,6 +1265,22 @@ public class RestAPI {
 		}
 		
 		return output;
+	}
+	
+	/*
+	 *  Additional method by Mike S.
+	 */
+	public boolean isConnectedToInternet() {
+		
+		Log.e("cnctn", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()); //honk
+		Log.e("cnctn", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()); //honk
+		
+		if(((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
+				((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }
