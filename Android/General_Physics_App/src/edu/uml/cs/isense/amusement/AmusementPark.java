@@ -40,7 +40,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -59,7 +58,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.provider.MediaStore;
@@ -832,8 +830,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    return dialog;
 	}
 
-    private AlertDialog getSavePrompt(final Handler h, String message) {		
-        
+    private AlertDialog getSavePrompt(final Handler h, String message) {	
+    	
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
