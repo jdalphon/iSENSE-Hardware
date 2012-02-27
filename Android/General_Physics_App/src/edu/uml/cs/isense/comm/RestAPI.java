@@ -48,7 +48,7 @@ public class RestAPI {
 	private int uid;
 	private JSONArray dataCache;
 	
-	public static String connection = "";
+	public String connection = "";
 	
 	protected RestAPI() {
 
@@ -378,25 +378,28 @@ public class RestAPI {
 		}
 		
 	}
-	
+	/* honk. mike killed this with log's to debug. remember to remove them */
 	public Boolean login(String username, String password) {
 		String url = "method=login&username=" + URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password);
 		
-		/*if((!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
-				(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) 
-			connection = "NONE";
-		else
-			connection = "";
-		*/
+		Log.e("CNCTN", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected());
+		Log.e("CNCTN", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected());
+		Log.e("CNCTN", "cnMng: " + connectivityManager);
+		
 		if (connectivityManager != null && ( connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) {
 			try {
 				connection = "";
 				String data = makeRequest(url);
 				
 				// Parse JSON Result
+				Log.e("CNCTN", "data: " + data);
+				Log.e("CNCTN", "url: "  + url );
 				JSONObject o = new JSONObject(data);
+				Log.e("CNCTN", "o: " + o);
 				session_key = o.getJSONObject("data").getString("session");
+				Log.e("CNCTN", "session_key: " + session_key);
 				uid = o.getJSONObject("data").getInt("uid");
+				Log.e("CNCTN", "uid: " + uid);
 				
 				if (isLoggedIn()) {
 					this.username = username;
@@ -406,20 +409,24 @@ public class RestAPI {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 				connection = "NONE";
+				Log.e("CNCTN", "MalformedURLException: " + e);
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
 				connection = "NONE";
+				Log.e("CNCTN", "IOException: " + e);
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
-				connection = "NONE";
+				connection = "600";
+				Log.e("CNCTN", "Exception: " + e);
 				return false;
 			}
 			
 			return true;
 		}
 		connection = "NONE";
+		Log.e("CNCTN", "Never connected!");
 		return false;
 	}
 	

@@ -67,12 +67,14 @@ import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -199,7 +201,22 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         setContentView(R.layout.main);
         
         // Display the End User Agreement
-        new SimpleEula(this).show();
+        AlertDialog.Builder adb = new SimpleEula(this).show();
+        if(adb != null) {
+        	Dialog dialog = adb.create();
+        	
+        	Display display = getWindowManager().getDefaultDisplay(); 
+        	int mwidth = display.getWidth();
+        	int mheight = display.getHeight();
+
+        	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        	
+        	lp.copyFrom(dialog.getWindow().getAttributes());
+	    	lp.width = mwidth;
+	    	lp.height = mheight;
+	    	dialog.show();
+	    	dialog.getWindow().setAttributes(lp);
+        }
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
         
@@ -503,7 +520,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	}
     }
 
-
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(Menu.NONE, MENU_ITEM_SETUP,  Menu.NONE, "Setup" );
@@ -603,7 +619,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	protected Dialog onCreateDialog(final int id) {
 	    Dialog dialog;
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	
+    	Display display = getWindowManager().getDefaultDisplay(); 
+    	int mwidth = display.getWidth();
+    	int mheight = display.getHeight();
 
+    	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+    	
 	    switch(id) {
 	    case MENU_ITEM_SETUP:
 	    	dialog = getSavePrompt(new Handler() {
@@ -623,6 +645,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			      } 
 			}, "Configure Options");
 	    	dialog.setCancelable(true);
+	    	
 	    	sessionName.setText(partialSessionName);
 	        break;
 	        
@@ -822,6 +845,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    }
 	    
 	    if (dialog != null) {
+	    	
+	    	lp.copyFrom(dialog.getWindow().getAttributes());
+	    	lp.width = mwidth;
+	    	lp.height = mheight;
+	    	dialog.show();
+	    	dialog.getWindow().setAttributes(lp);
+	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
             	public void onDismiss(DialogInterface dialog) {
@@ -836,6 +866,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     private AlertDialog getSavePrompt(final Handler h, String message) {		
         
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	
     	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
@@ -992,7 +1023,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 				}
 			}
 		});
-       
+		
         builder.setTitle(message)
         	   .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
         		   public void onClick(DialogInterface dialog, int id) {
