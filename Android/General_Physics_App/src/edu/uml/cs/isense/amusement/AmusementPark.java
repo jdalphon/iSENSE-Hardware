@@ -68,6 +68,7 @@ import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -193,12 +194,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
-	
+    
+    static int mheight = 1;
+	static int mwidth = 1;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
+    	mwidth = deviceDisplay.getWidth();
+    	mheight = deviceDisplay.getHeight();
         
         // Display the End User Agreement
         AlertDialog.Builder adb = new SimpleEula(this).show();
@@ -627,10 +634,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
     	//dialog.show();
     	
-    	Display display = getWindowManager().getDefaultDisplay(); 
-    	int mwidth = display.getWidth();
-    	int mheight = display.getHeight();
-
     	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
     	
 	    switch(id) {
@@ -647,7 +650,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			    	  		canobieIsChecked = canobieBackup;
 			    	  		break;
 			    	  }
-			          rideName.setText("Ride Name: " + rideNameString /*+ " " + seats.getText().toString()*/);
+			          rideName.setText("Ride Name: " + rideNameString);
 
 			      } 
 			}, "Configure Options");
@@ -858,8 +861,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
+	    	lp.gravity = Gravity.LEFT | Gravity.TOP;
 	    	//lp.x = mwidth/2;
-	    	//lp.y = mheight/2;
+	    	lp.y = mheight / 2;
 	    	lp.dimAmount=0.7f;
 	    	//dialog.show();
 	    	dialog.getWindow().setAttributes(lp);

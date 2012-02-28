@@ -1,16 +1,21 @@
 package edu.uml.cs.isense.amusement;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import edu.uml.cs.isense.comm.RestAPI;
@@ -103,7 +108,15 @@ public class LoginActivity {
 		else if(rapi.connection == "") message = unknownUser;
 		else message = defaultMessage;
 			
-		new AlertDialog.Builder(mContext)
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+    	Dialog dialog;
+    	
+    	int myHeight = AmusementPark.mheight;
+    	int myWidth  = AmusementPark.mwidth;
+
+    	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+    	
+		builder
 			.setTitle("Login Failed")
 			.setMessage(message)
 			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -117,7 +130,25 @@ public class LoginActivity {
 					msg.sendToTarget();
 				}
 			})
-			.show();
+			.setCancelable(false)
+			.create();
+		
+		dialog = builder.create();
+		
+		dialog.show();
+    	
+    	lp.copyFrom(dialog.getWindow().getAttributes());
+    	lp.width = myWidth;
+    	lp.height = myHeight;
+    	lp.gravity = Gravity.LEFT | Gravity.TOP;
+    	//lp.x = myWidth/2;
+    	lp.y = myHeight / 2;
+    	lp.dimAmount=0.7f;
+    	//dialog.show();
+    	dialog.getWindow().setAttributes(lp);
+    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    	
+    	
 	}
 	
 }
