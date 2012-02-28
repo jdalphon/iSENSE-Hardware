@@ -214,8 +214,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
+	    	lp.x = mwidth/2;
+	    	lp.y = mheight/2;
+	    	lp.dimAmount=0.0f;
 	    	dialog.show();
 	    	dialog.getWindow().setAttributes(lp);
+	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
         }
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
@@ -617,8 +621,11 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	}
     
 	protected Dialog onCreateDialog(final int id) {
-	    Dialog dialog;
+	    
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	Dialog dialog;// = builder.setView(new View(this)).create();
+    	
+    	//dialog.show();
     	
     	Display display = getWindowManager().getDefaultDisplay(); 
     	int mwidth = display.getWidth();
@@ -713,7 +720,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    				+ "Data points: " + dataPointCount + "\n"
 	    				+ "End date and time: \n" + dateString + "\n"
 	    				+ "Filename: \n" + rideNameString + "-" + seatString + "-" + dateString)
-	    	.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 	    		public void onClick(DialogInterface dialoginterface,int i) {
 	    			dialoginterface.dismiss();
 	    			picCount.setText("Pictures and Videos Taken: 0");
@@ -846,11 +853,17 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    if (dialog != null) {
 	    	
+	    	dialog.show();
+	    	
 	    	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
-	    	dialog.show();
+	    	//lp.x = mwidth/2;
+	    	//lp.y = mheight/2;
+	    	lp.dimAmount=0.7f;
+	    	//dialog.show();
 	    	dialog.getWindow().setAttributes(lp);
+	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
@@ -860,14 +873,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
             });
 	    }
 	    
-	    return dialog;
+	    return null;
 	}
 
     private AlertDialog getSavePrompt(final Handler h, String message) {		
         
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	
-    	
+    	    	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
     	        
