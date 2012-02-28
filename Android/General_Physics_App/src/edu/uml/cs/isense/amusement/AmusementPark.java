@@ -854,18 +854,16 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    if (dialog != null) {
 	    	
-	    	dialog.show();
-	    	
 	    	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
-	    	lp.gravity = Gravity.LEFT | Gravity.TOP;
-	    	//lp.x = mwidth/2;
-	    	lp.y = mheight / 2;
+	    	lp.gravity = Gravity.CENTER_VERTICAL;
 	    	lp.dimAmount=0.7f;
-	    	//dialog.show();
+	    	
 	    	dialog.getWindow().setAttributes(lp);
 	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+	    	
+	    	/** Your show was BEFORE the setAttributes, so that was the problem.*/dialog.show();
 	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
