@@ -66,6 +66,7 @@ import android.text.InputType;
 import android.text.method.NumberKeyListener;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -191,12 +192,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String loginName = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
-	
+    
+    static int mheight = 1;
+	static int mwidth = 1;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
+    	mwidth = deviceDisplay.getWidth();
+    	mheight = deviceDisplay.getHeight();
         
         // Display the End User Agreement
         AlertDialog.Builder adb = new SimpleEula(this).show();
@@ -212,8 +219,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
+	    	lp.x = mwidth/2;
+	    	lp.y = mheight/2;
+	    	lp.dimAmount=0.0f;
 	    	dialog.show();
 	    	dialog.getWindow().setAttributes(lp);
+	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
         }
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
@@ -615,13 +626,12 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	}
     
 	protected Dialog onCreateDialog(final int id) {
-	    Dialog dialog;
+	    
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	Dialog dialog;// = builder.setView(new View(this)).create();
     	
-    	Display display = getWindowManager().getDefaultDisplay(); 
-    	int mwidth = display.getWidth();
-    	int mheight = display.getHeight();
-
+    	//dialog.show();
+    	
     	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
     	
 	    switch(id) {
@@ -638,7 +648,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			    	  		canobieIsChecked = canobieBackup;
 			    	  		break;
 			    	  }
-			          rideName.setText("Ride Name: " + rideNameString /*+ " " + seats.getText().toString()*/);
+			          rideName.setText("Ride Name: " + rideNameString);
 
 			      } 
 			}, "Configure Options");
@@ -711,7 +721,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    				+ "Data points: " + dataPointCount + "\n"
 	    				+ "End date and time: \n" + dateString + "\n"
 	    				+ "Filename: \n" + rideNameString + "-" + seatString + "-" + dateString)
-	    	.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 	    		public void onClick(DialogInterface dialoginterface,int i) {
 	    			dialoginterface.dismiss();
 	    			picCount.setText("Pictures and Videos Taken: 0");
@@ -844,11 +854,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    if (dialog != null) {
 	    	
+	    	dialog.show();
+	    	
 	    	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
-	    	dialog.show();
+	    	lp.gravity = Gravity.LEFT | Gravity.TOP;
+	    	//lp.x = mwidth/2;
+	    	lp.y = mheight / 2;
+	    	lp.dimAmount=0.7f;
+	    	//dialog.show();
 	    	dialog.getWindow().setAttributes(lp);
+	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
@@ -858,14 +875,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
             });
 	    }
 	    
-	    return dialog;
+	    return null;
 	}
 
     private AlertDialog getSavePrompt(final Handler h, String message) {	
     	
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	
-    	
+    	    	
     	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     	canobieIsChecked = canobieBackup;
     	        

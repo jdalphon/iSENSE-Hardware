@@ -1,16 +1,21 @@
 package edu.uml.cs.isense.amusement;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import edu.uml.cs.isense.comm.RestAPI;
@@ -31,7 +36,7 @@ public class LoginActivity {
 		private static final String unknownUser    = "Connection to internet has been found, but the username or password was incorrect.  Please try again.";
 		private static final String noConnection   = "No connection to internet through either wifi or mobile found.  Please enable one to continue, then try again."; 
 		private static final String defaultMessage = "Was your username and password correct?\nAre you connected to the internet?\nPlease try again.";
-		//private static final String error600       = "Our servers are busy right now and cannot log you in (http response code 600).";
+	  //private static final String error600       = "Our servers are busy right now and cannot log you in (http response code 600).";
 	/* } */
 	
 	@SuppressWarnings("unused")
@@ -100,9 +105,18 @@ public class LoginActivity {
 		Log.e("CNCTN", "connection: " + rapi.connection);
 		if(rapi.connection == "NONE") message = noConnection;
 		else if(rapi.connection == "600") message = unknownUser;
+		else if(rapi.connection == "") message = unknownUser;
 		else message = defaultMessage;
 			
-		new AlertDialog.Builder(mContext)
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+    	Dialog dialog;
+    	
+    	int myHeight = AmusementPark.mheight;
+    	int myWidth  = AmusementPark.mwidth;
+
+    	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+    	
+		builder
 			.setTitle("Login Failed")
 			.setMessage(message)
 			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -116,7 +130,25 @@ public class LoginActivity {
 					msg.sendToTarget();
 				}
 			})
-			.show();
+			.setCancelable(false)
+			.create();
+		
+		dialog = builder.create();
+		
+		dialog.show();
+    	
+    	lp.copyFrom(dialog.getWindow().getAttributes());
+    	lp.width = myWidth;
+    	lp.height = myHeight;
+    	lp.gravity = Gravity.LEFT | Gravity.TOP;
+    	//lp.x = myWidth/2;
+    	lp.y = myHeight / 2;
+    	lp.dimAmount=0.7f;
+    	//dialog.show();
+    	dialog.getWindow().setAttributes(lp);
+    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    	
+    	
 	}
 	
 }
