@@ -37,6 +37,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -60,6 +61,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.InputType;
@@ -195,11 +197,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     
     static int mheight = 1;
 	static int mwidth = 1;
+	//private static Context context;
+	public static Context mContext;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        mContext = this;
         
         Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
     	mwidth = deviceDisplay.getWidth();
@@ -213,18 +219,24 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         	Display display = getWindowManager().getDefaultDisplay(); 
         	int mwidth = display.getWidth();
         	int mheight = display.getHeight();
-
-        	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         	
-        	lp.copyFrom(dialog.getWindow().getAttributes());
-	    	lp.width = mwidth;
-	    	lp.height = mheight;
-	    	lp.x = mwidth/2;
-	    	lp.y = mheight/2;
-	    	lp.dimAmount=0.0f;
-	    	dialog.show();
-	    	dialog.getWindow().setAttributes(lp);
-	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+        	dialog.show();
+        	
+        	int apiLevel = getApiLevel();
+        	if(apiLevel >= 11) {
+
+        		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        	
+        		lp.copyFrom(dialog.getWindow().getAttributes());
+        		lp.width = mwidth;
+        		lp.height = mheight;
+        		lp.gravity = Gravity.CENTER_VERTICAL;
+        		lp.dimAmount=0.7f;
+	    	
+        		dialog.getWindow().setAttributes(lp);
+        		dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        		
+        	}
         }
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
@@ -625,6 +637,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
     
+	@Override
 	protected Dialog onCreateDialog(final int id) {
 	    
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -636,6 +649,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
 	    switch(id) {
 	    case MENU_ITEM_SETUP:
+	    	Log.wtf("Context", "Context = " + mContext);
 	    	dialog = getSavePrompt(new Handler() {
 				public void handleMessage(Message msg) { 
 					switch (msg.what) {
@@ -685,6 +699,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 				public void handleMessage(Message msg) { 
 					switch (msg.what) {
 			    		case DIALOG_OK:
+			    			if(len == 0 || len2 == 0)
+			    				Toast.makeText(AmusementPark.this, "There is no data to upload!", Toast.LENGTH_LONG).show();
 			    			showDialog(DIALOG_CHOICE);
 			    			partialSessionName = sessionName.getText().toString();
 			    	  		break;
@@ -742,9 +758,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    			
 	    			dialoginterface.dismiss();
 	    			
-	    			if( len == 0 || len2 == 0) {
+	    			if(len == 0 || len2 == 0)
 	    				Toast.makeText(AmusementPark.this, "There is no data to upload!", Toast.LENGTH_LONG).show();
-	    			}
+	    			
 	    			else {
 	    				
 	    				String isValid = experimentInput.getText().toString();
@@ -854,16 +870,23 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    if (dialog != null) {
 	    	
-	    	lp.copyFrom(dialog.getWindow().getAttributes());
-	    	lp.width = mwidth;
-	    	lp.height = mheight;
-	    	lp.gravity = Gravity.CENTER_VERTICAL;
-	    	lp.dimAmount=0.7f;
+	    	int apiLevel = getApiLevel();
+	    	if(apiLevel >= 11) {
+	    		dialog.show(); /* works but doesnt center it */
+		    	
+		    	lp.copyFrom(dialog.getWindow().getAttributes());
+		    	lp.width = mwidth;
+		    	lp.height = mheight;
+		    	lp.gravity = Gravity.CENTER_VERTICAL;
+		    	lp.dimAmount=0.7f;
+		    	
+		    	dialog.getWindow().setAttributes(lp);
+		    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+	    	} else {
+	    		dialog.show();
+	    	}
 	    	
-	    	dialog.getWindow().setAttributes(lp);
-	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-	    	
-	    	/** Your show was BEFORE the setAttributes, so that was the problem.*/dialog.show();
+	    	//dialog.show(); /*doesnt work when installed in landscape mode:*/
 	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
@@ -1070,49 +1093,117 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	}    
     
     public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
-		Cursor cursor = null;
-		try {
-		    String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
-		    cursor = activity.managedQuery( imageUri,
-		            proj, 		// Which columns to return
-		            null,       // WHERE clause; which rows to return (all rows)
-		            null,       // WHERE clause selection arguments (none)
-		            null); 		// Order-by clause (ascending by name)
-		    int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-		    int orientation_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.ORIENTATION);
-		    if (cursor.moveToFirst()) {
-		        @SuppressWarnings("unused")
-					String orientation =  cursor.getString(orientation_ColumnIndex);
-		        return new File(cursor.getString(file_ColumnIndex));
-		    }
-		    return null;
-		} finally {
-		    if (cursor != null) {
-		        cursor.close();
-		    }
-		}
+		
+    	int apiLevel = getApiLevel();//Integer.parseInt(android.os.Build.VERSION.SDK);
+    	if (apiLevel >= 11) {
+    		Log.wtf("yup", "right place PIK-CHA!");
+    		String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
+    		String selection = null;
+    		String[] selectionArgs = null;
+    		String sortOrder = null;
+
+    		CursorLoader cursorLoader = new CursorLoader(
+    		        mContext,//AmusementPark.getAppContext(),
+    		        imageUri, 
+    		        proj, 
+    		        selection, 
+    		        selectionArgs, 
+    		        sortOrder);
+
+    		Cursor cursor = cursorLoader.loadInBackground();
+    		
+    		int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			int orientation_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.ORIENTATION);
+	    	if (cursor.moveToFirst()) {
+	    		@SuppressWarnings("unused")
+	    			String orientation =  cursor.getString(orientation_ColumnIndex);
+	    		return new File(cursor.getString(file_ColumnIndex));
+	    	}
+	    	return null;
+		    
+    	} else {
+    		Log.wtf("NOPE", "WRONG PLACE BUDDY! PIK-CHA!!!");
+    		Cursor cursor = null;
+    		try {
+    			String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
+    			cursor = activity.managedQuery( imageUri,
+    					proj, 		// Which columns to return
+    					null,       // WHERE clause; which rows to return (all rows)
+    					null,       // WHERE clause selection arguments (none)
+    					null); 		// Order-by clause (ascending by name)
+    			int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+    			int orientation_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.ORIENTATION);
+		    	if (cursor.moveToFirst()) {
+		    		@SuppressWarnings("unused")
+		    			String orientation =  cursor.getString(orientation_ColumnIndex);
+		    		return new File(cursor.getString(file_ColumnIndex));
+		    	}
+		    	return null;
+    		} finally {
+    			if (cursor != null) {
+    				cursor.close();
+    			}
+    		}
+    	}
 	}
     
     public static File convertVideoUriToFile (Uri videoUri, Activity activity)  {
-		Cursor cursor = null;
-		try {
-		    String [] proj={MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
-		    cursor = activity.managedQuery( videoUri,
-		            proj, 		// Which columns to return
-		            null,       // WHERE clause; which rows to return (all rows)
-		            null,       // WHERE clause selection arguments (none)
-		            null); 		// Order-by clause (ascending by name)
-		    int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+    	
+    	int apiLevel = getApiLevel();//Integer.parseInt(android.os.Build.VERSION.SDK);
+    	if (apiLevel >= 11) {
+    		Log.wtf("yup", "right place VIDIO!");
+    		String [] proj={MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
+    		String selection = null;
+    		String[] selectionArgs = null;
+    		String sortOrder = null;
+
+    		CursorLoader cursorLoader = new CursorLoader(
+    		        mContext,//AmusementPark.getAppContext(),
+    		        videoUri, 
+    		        proj, 
+    		        selection, 
+    		        selectionArgs, 
+    		        sortOrder);
+
+    		Cursor cursor = cursorLoader.loadInBackground();
+    		int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
 		    if (cursor.moveToFirst()) {
 		        return new File(cursor.getString(file_ColumnIndex));
 		    }
 		    return null;
-		} finally {
-		    if (cursor != null) {
-		        cursor.close();
-		    }
-		}
+		    
+    	} else {
+    		Log.wtf("NOPE", "WRONG PLACE BUDDY, VIDIO!!!");
+    		Cursor cursor = null;
+    		/*Context context = AmusementPark.getAppContext();*/
+    		try {
+    		    String [] proj={MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
+    		    cursor = activity.managedQuery(videoUri,
+    		            proj, 		// Which columns to return
+    		            null,       // WHERE clause; which rows to return (all rows)
+    		            null,       // WHERE clause selection arguments (none)
+    		            null); 		// Order-by clause (ascending by name)
+    		    int file_ColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+    		    if (cursor.moveToFirst()) {
+    		        return new File(cursor.getString(file_ColumnIndex));
+    		    }
+    		    return null;
+    		} finally {
+    		    if (cursor != null) {
+    		        cursor.close();
+    		    }
+    		}
+    	}
+		
 	}
+    
+    static int getApiLevel() {
+    	return Integer.parseInt(android.os.Build.VERSION.SDK);
+    }
+    
+    /*public static Context getAppContext() {
+        return AmusementPark.context;
+    }*/
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
