@@ -628,13 +628,14 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	protected Dialog onCreateDialog(final int id) {
 	    
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	Dialog dialog;// = builder.setView(new View(this)).create();
+    	Dialog dialog;
+    	// = builder.setView(new View(this)).create();
     	
     	//dialog.show();
     	
     	WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-    	
-	    switch(id) {
+ 
+    	switch(id) {
 	    case MENU_ITEM_SETUP:
 	    	dialog = getSavePrompt(new Handler() {
 				public void handleMessage(Message msg) { 
@@ -854,16 +855,20 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    if (dialog != null) {
 	    	
+	    	dialog.getWindow().setAttributes(lp);
+	    		    	
+	    	dialog.show();
+	    	
 	    	lp.copyFrom(dialog.getWindow().getAttributes());
 	    	lp.width = mwidth;
 	    	lp.height = mheight;
-	    	lp.gravity = Gravity.CENTER_VERTICAL;
 	    	lp.dimAmount=0.7f;
+	    	lp.gravity = Gravity.CENTER_VERTICAL;
 	    	
-	    	dialog.getWindow().setAttributes(lp);
+	       	dialog.getWindow().setAttributes(lp);
 	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 	    	
-	    	/** Your show was BEFORE the setAttributes, so that was the problem.*/dialog.show();
+	    	
 	    	
 	    	dialog.setOnDismissListener(new OnDismissListener() {
             	@Override
@@ -875,6 +880,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    
 	    return null;
 	}
+
 
     private AlertDialog getSavePrompt(final Handler h, String message) {	
     	
@@ -1072,9 +1078,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 		Cursor cursor = null;
 		try {
+			
 		    String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
-		    cursor = activity.managedQuery( imageUri,
-		            proj, 		// Which columns to return
+		    cursor = activity.managedQuery(imageUri,
+		    		proj, 		// Which columns to return
 		            null,       // WHERE clause; which rows to return (all rows)
 		            null,       // WHERE clause selection arguments (none)
 		            null); 		// Order-by clause (ascending by name)
