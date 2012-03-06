@@ -6,12 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
+//import android.content.DialogInterface.OnDismissListener;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Display;
+//import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,20 +134,21 @@ public class LoginActivity {
 			.create();
 		
 		dialog = builder.create();
-		
+	
 		dialog.show();
-    	
-    	lp.copyFrom(dialog.getWindow().getAttributes());
-    	lp.width = myWidth;
-    	lp.height = myHeight;
-    	lp.gravity = Gravity.LEFT | Gravity.TOP;
-    	//lp.x = myWidth/2;
-    	lp.y = myHeight / 2;
-    	lp.dimAmount=0.7f;
-    	//dialog.show();
-    	dialog.getWindow().setAttributes(lp);
-    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-    	
+		
+    	int apiLevel = AmusementPark.getApiLevel();
+    	if(apiLevel >= 11) {
+    		
+	    	lp.copyFrom(dialog.getWindow().getAttributes());
+	    	lp.width = myWidth;
+	    	lp.height = myHeight;
+	    	lp.gravity = Gravity.CENTER_VERTICAL;
+	    	lp.dimAmount=0.7f;
+	    	
+	    	dialog.getWindow().setAttributes(lp);
+	    	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    	}
     	
 	}
 	
