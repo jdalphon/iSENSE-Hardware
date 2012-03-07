@@ -14,7 +14,7 @@
 /***************************************************************************************************/
 /***************************************************************************************************/
  
-  
+
 package edu.uml.cs.isense.amusement;
 
 import java.io.BufferedWriter;
@@ -61,7 +61,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.InputType;
