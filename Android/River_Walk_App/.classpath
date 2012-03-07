@@ -4,5 +4,5 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="/Users/jpoulin/Jer&apos;s Stuff/iSENSE/trunk/embedded/Android/assets/apache-mime4j-0.6.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

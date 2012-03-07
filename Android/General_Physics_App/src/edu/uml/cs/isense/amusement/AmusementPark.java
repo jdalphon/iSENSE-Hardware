@@ -200,6 +200,8 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	static int mwidth = 1;
 	
 	public static Context mContext;
+	private ArrayList<File> pictureArray = new ArrayList<File>();
+	private ArrayList<File> videoArray   = new ArrayList<File>();
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1299,6 +1301,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {				
 	            File f = convertImageUriToFile(imageUri, this);
 	            pictures.add(f);
+	            pictureArray.add(f);
 	            mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1306,6 +1309,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {
 				File f = convertVideoUriToFile(videoUri, this);
 				videos.add(f);
+				videoArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1338,8 +1342,29 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			}
 			
 			
-			rapi.putSessionData( sessionId, experimentInput.getText().toString(), dataSet);
+			boolean hasPut = rapi.putSessionData( sessionId, experimentInput.getText().toString(), dataSet);
+			Log.e("Pics", "putSessionData success: " + hasPut);
 			
+			while(pictureArray.size() > 0) {
+				
+				boolean hUp = rapi.uploadPictureToSession(pictureArray.get(0), experimentInput.getText().toString(), 
+						sessionId, sessionName.getText().toString(), "N/A");
+				Log.e("Pics", "has uploaded: " + hUp);
+				pictureArray.remove(0);
+				
+			}
+			while(videoArray.size() > 0) {
+				/* this still needs to be created in rapi!!
+					  
+				rapi.uploadVideoToSession(videoArray.get(0), experimentInput.getText().toString(), 
+						sessionId, sessionName.getText().toString(), "N/A");
+					
+			  	videoArray.remove(0);
+					  
+				  
+				 */
+			}
+				
 		}
 		
 	};
