@@ -2,17 +2,17 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/setupScroll"
-	android:layout_width="fill_parent"
+	android:layout_width="match_parent"
 	android:layout_height="wrap_content">
 <LinearLayout 
 	android:orientation="vertical"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:scrollbars="vertical" >
     
     <TextView android:layout_height="wrap_content" 
-			android:layout_width="fill_parent" 
+			android:layout_width="match_parent" 
 			android:id="@+id/iSenseOnlyOptions" 
 			android:text="@string/iSenseConfig"
 			android:gravity="center_horizontal"
@@ -21,7 +21,7 @@
 			android:paddingTop="12dip"/>
     
     <RelativeLayout android:orientation="vertical"
-    	android:layout_width="fill_parent"
+    	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
@@ -33,7 +33,7 @@
 			android:textColor="@android:color/black"
 			android:paddingTop="12dip"/>
 		<EditText android:text=""
-			android:layout_width="fill_parent" 
+			android:layout_width="match_parent" 
 			android:inputType="text"
 			android:id="@+id/sessionName" 
 			android:maxLength="50"
@@ -47,7 +47,7 @@
 	</RelativeLayout>
 	
 	<RelativeLayout android:orientation="vertical" 
-		android:layout_width="fill_parent"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@android:color/white"
 		android:paddingBottom="5dp">
@@ -80,7 +80,7 @@
 	</RelativeLayout>
 	
 	<TextView android:layout_height="wrap_content" 
-			android:layout_width="fill_parent" 
+			android:layout_width="match_parent" 
 			android:id="@+id/otherOptions" 
 			android:text="@string/otherConfig"
 			android:gravity="center_horizontal"
@@ -89,7 +89,7 @@
 			android:paddingTop="12dip"/>
 
 	<RelativeLayout android:orientation="vertical"
-    	android:layout_width="fill_parent"
+    	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
@@ -102,7 +102,7 @@
 			android:paddingTop="12dip"/>
 			
 		<EditText android:text="1" 
-			android:layout_width="fill_parent" 
+			android:layout_width="match_parent" 
 			android:inputType="phone"
 			android:digits="1234567890"
 			android:imeOptions="actionDone"
@@ -116,12 +116,12 @@
 	</RelativeLayout>
 	
 	<RelativeLayout android:orientation="vertical"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white">
        
         <CheckBox android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:id="@+id/isCanobie"
             android:text="Canobie Lake Park Rides"
             android:textColor="@android:color/black"
@@ -140,7 +140,7 @@
            
         <Spinner
             android:id="@+id/rides"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:prompt="@string/rides_prompt"
             android:layout_toRightOf="@+id/rideNameLabel"
@@ -149,20 +149,20 @@
     </RelativeLayout>
         
     <LinearLayout android:orientation="horizontal"
-    	android:layout_width="fill_parent"
+    	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
     	android:background="@android:color/white">
     	
     	<Button
     		android:id="@+id/pictureButton"
-    		android:layout_width="fill_parent"
+    		android:layout_width="match_parent"
     		android:layout_height="wrap_content"
     		android:text="Take a Picture"
     		android:layout_weight="1"/>
     		
     	<Button
     		android:id="@+id/videoButton"
-    		android:layout_width="fill_parent"
+    		android:layout_width="match_parent"
     		android:layout_height="wrap_content"
     		android:text="Take a Video"
     		android:layout_toRightOf="@id/pictureButton"
