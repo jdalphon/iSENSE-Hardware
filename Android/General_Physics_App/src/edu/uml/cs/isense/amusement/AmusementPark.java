@@ -197,7 +197,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     
     static int mheight = 1;
 	static int mwidth = 1;
-	//private static Context context;
 	public static Context mContext;
 	
     @Override
