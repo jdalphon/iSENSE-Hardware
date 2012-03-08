@@ -61,7 +61,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.InputType;
@@ -519,6 +518,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		File f = pictures.get(i);
     		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".jpeg");
     		f.renameTo(newFile);
+    		pictureArray.add(newFile); //clutch fix
     	}
     	
     	pictures.clear();
@@ -1289,11 +1289,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	return Integer.parseInt(android.os.Build.VERSION.SDK);
     }
     
-    /*public static Context getAppContext() {
-        return AmusementPark.context;
-    }*/
-	
-	@Override
+  	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
@@ -1301,15 +1297,15 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {				
 	            File f = convertImageUriToFile(imageUri, this);
 	            pictures.add(f);
-	            pictureArray.add(f);
-	            mediaCount++;
+	            //pictureArray.add(f);
+				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
 		} else if (requestCode == CAMERA_VID_REQUESTED) {
 			if(resultCode == RESULT_OK) {
 				File f = convertVideoUriToFile(videoUri, this);
 				videos.add(f);
-				videoArray.add(f);
+				//videoArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1345,14 +1341,18 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			boolean hasPut = rapi.putSessionData( sessionId, experimentInput.getText().toString(), dataSet);
 			Log.e("Pics", "putSessionData success: " + hasPut);
 			
-			while(pictureArray.size() > 0) {
+			int pic = pictureArray.size();
+			
+			while(pic > 0) {
 				
-				boolean hUp = rapi.uploadPictureToSession(pictureArray.get(0), experimentInput.getText().toString(), 
+				boolean hUp = rapi.uploadPictureToSession(pictureArray.get(pic - 1),
+						experimentInput.getText().toString(), 
 						sessionId, sessionName.getText().toString(), "N/A");
 				Log.e("Pics", "has uploaded: " + hUp);
-				pictureArray.remove(0);
+				pic--;
 				
 			}
+			pictureArray.clear();
 			while(videoArray.size() > 0) {
 				/* this still needs to be created in rapi!!
 					  

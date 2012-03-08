@@ -285,6 +285,7 @@ public class RestAPI {
 			}
 			
 		} catch (Exception e) {
+			Log.e("Pic", ""+e);
 			return false;
 		}
 		
