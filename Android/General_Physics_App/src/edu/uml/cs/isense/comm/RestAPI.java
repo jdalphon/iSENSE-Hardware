@@ -144,29 +144,41 @@ public class RestAPI {
 	    is.close();
 	    return bytes;
 	}
-	
+	/** KILLED WITH LOGS!  REMOVE BEFORE FINISHING!!!!!!!!!!!!!*/
 	public Boolean uploadPictureToSession(File image, String eid, int sid, String img_name, String img_desc) {
 		//String target = "?method=uploadImageToSession&session_key=" + session_key + "&sid=" + sid + "&img_name=" + img_name + "&img_desc=" + img_desc;
-		
+		int i = 0; 
+		Log.e("iCount", "i = " + i++);
 		try {
-			byte[] data = getBytesFromFile(image);
+			Log.e("iCount", "i = " + i++);
+			byte[] data = getBytesFromFile(image); /* FAILS HERE!!! HONK HONK BLARGH BLARGH!!!*/
+			Log.e("iCount", "i = " + i++);
 			
 			String lineEnd = "\r\n";
 			String twoHyphens = "--";
 			String boundary = "*****";
 			
 			URL connectURL = new URL(this.base_url);
+			Log.e("iCount", "i = " + i++);
 			HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
+			Log.e("iCount", "i = " + i++);
 			conn.setDoInput(true);
+			Log.e("iCount", "i = " + i++);
 			conn.setDoOutput(true);
+			Log.e("iCount", "i = " + i++);
 			conn.setUseCaches(false);
+			Log.e("iCount", "i = " + i++);
 			conn.setRequestMethod("POST");
-	
+			Log.e("iCount", "i = " + i++);
+			
 			conn.setRequestProperty("Connection", "Keep-Alive");
+			Log.e("iCount", "i = " + i++);
 			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
-	
+			Log.e("iCount", "i = " + i++);
+			
 			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
-	
+			Log.e("iCount", "i = " + i++);
+			
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			dos.writeBytes("Content-Disposition: form-data; name=\"method\"" + lineEnd);
@@ -176,6 +188,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -186,6 +199,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -196,6 +210,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 			
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -206,6 +221,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -216,6 +232,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -226,6 +243,7 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
+			Log.e("iCount", "i = " + i++);
 
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			// write content header
@@ -233,6 +251,7 @@ public class RestAPI {
 			dos.writeBytes(lineEnd);
 			dos.writeBytes("Content-Type: image/jpeg" + lineEnd);
 			dos.writeBytes(lineEnd);
+			Log.e("iCount", "i = " + i++);
 	
 			// create a buffer of maximum size
 	
@@ -246,15 +265,19 @@ public class RestAPI {
 			// close streams
 			dos.flush();
 			dos.close();
-		
+			Log.e("iCount", "i = " + i++);
+			
 			try {
 				DataInputStream inStream = new DataInputStream(conn.getInputStream());
 				String str;
+				Log.e("iCount", "i = " + i++);
 
 				while ((str = inStream.readLine()) != null) {
+					Log.e("iCount", "i = " + i++);
 					Log.d("rapi", "Server Response" + str);
 				}
 				inStream.close();
+				Log.e("iCount", "i = " + i++);
 				return true;
 			} catch (IOException ioex) {
 				Log.e("rapi", "error: " + ioex.getMessage(), ioex);

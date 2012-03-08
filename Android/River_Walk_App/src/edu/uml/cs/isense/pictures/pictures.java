@@ -381,8 +381,13 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 			new TaskWait().execute();
 			/*pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Uploading");
+<<<<<<< HEAD
 			 wl.acquire();//prevents upload from stopping		
 			*/
+=======
+			wl.acquire();//prevents upload from stopping		
+			
+>>>>>>> aa45ff59b0cb6fa2b4e76b7757bf8792fba4164a
 			/**JER 3**************************************************************************************************************/
 			if (teacherInfo != null) teacher = " - " + teacherInfo ;
 			else teacher = "" ;
@@ -434,30 +439,31 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 				// load the origial BitMap (500 x 500 px)
 				if( BitmapFactory.decodeFile(picture_me) != null ) {
 					bitmapOrg = BitmapFactory.decodeFile(picture_me) ;
-		        int width = bitmapOrg.getWidth();
-		        int height = bitmapOrg.getHeight();
-		        int newWidth = 1024;
-		        int newHeight = 768;
+					int width = bitmapOrg.getWidth();
+					int height = bitmapOrg.getHeight();
+					int newWidth = 1024;
+					int newHeight = 768;
 		        
-		        // calculate the scale
-		        float scaleWidth = ((float) newWidth) / width;
-		        float scaleHeight = ((float) newHeight) / height;
+					// calculate the scale
+					float scaleWidth = ((float) newWidth) / width;
+					float scaleHeight = ((float) newHeight) / height;
 		        
-		        // create a matrix for the manipulation
-		        Matrix matrix = new Matrix();
-		        // resize the bit map
-		        matrix.postScale(scaleWidth, scaleHeight);
-
-		        // recreate the new Bitmap
-		        bitmapOrg = Bitmap.createBitmap(bitmapOrg, 1, 1, 
-		                          1024, 768, matrix, true);
-		        try {
-					bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 10, new FileOutputStream( mpicture )) ;
-					//FileOutputStream.this.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	        		        
+					// create a matrix for the manipulation
+					Matrix matrix = new Matrix();
+		        
+					// resize the bit map
+					matrix.postScale(scaleWidth, scaleHeight);
+		        
+					// recreate the new Bitmap
+					bitmapOrg = Bitmap.createBitmap(bitmapOrg, 1, 1, 
+							1024, 768, matrix, true);
+					try {
+						bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 10, new FileOutputStream( mpicture )) ;
+						//FileOutputStream.this.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	        		        
 				}
 				
 		        takePicture.setEnabled(false);
