@@ -379,10 +379,10 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 		@Override
 		public void run() {
 			new TaskWait().execute();
-			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			/*pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Uploading");
 			 wl.acquire();//prevents upload from stopping		
-			
+			*/
 			/**JER 3**************************************************************************************************************/
 			if (teacherInfo != null) teacher = " - " + teacherInfo ;
 			else teacher = "" ;
