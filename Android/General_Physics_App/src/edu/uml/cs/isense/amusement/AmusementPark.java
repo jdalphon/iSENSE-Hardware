@@ -192,6 +192,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public static String textToSession = "";
     public static String toSendOut = "";
     public static String loginName = "";
+    public static String loginPass = "";
     public static String experimentId = "";
     public static JSONArray dataSet;
     
@@ -263,7 +264,17 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         loginInfo.setText(" Not Logged In");
         loginInfo.setTextColor(Color.RED);
         
-      
+        if(running)
+    		showDialog(DIALOG_FORCE_STOP);
+    	if(loginName != "") {
+    		boolean success = rapi.login(loginName, loginPass); /* clutch. if you press back, this logs */
+    		if(success) {                                       /* you back in                          */
+    			loginInfo.setText(" "+ loginName);
+    			loginInfo.setTextColor(Color.GREEN);
+    		}
+    	}
+    	picCount.setText("Pictures and Videos Taken: " + mediaCount);    /* not so clutch. always shows 0 */
+        
         startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
         startStop.setOnLongClickListener(new OnLongClickListener() {
 
@@ -541,6 +552,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		File f = videos.get(i);
     		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".3gp");
     		f.renameTo(newFile);
+    		videoArray.add(newFile); // copying the clutchness
     	}
     	
     	videos.clear();
@@ -576,6 +588,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public void onStart() {
     	super.onStart();
     	inPausedState = false;
+    	
     }
     
     @Override
@@ -584,7 +597,9 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	inPausedState = false;
     	if(running)
     		showDialog(DIALOG_FORCE_STOP);
-    		
+    	if(loginName != "")
+    		rapi.login(loginName, loginPass);
+    	picCount.setText("Pictures and Videos Taken: " + mediaCount);
     }
     
     @Override
@@ -825,7 +840,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    case DIALOG_CHOICE:
 	    	
 			builder.setTitle("Select An Action:")
-	    	.setMessage("Would you like to upload your data to iSENSE?")
+	    	.setMessage("Would you like to upload your data, pictures, and videos to iSENSE?")
 	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 	    		public void onClick(DialogInterface dialoginterface,int i) {
 	    			
@@ -1182,7 +1197,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     
     public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 		
-    	int apiLevel = getApiLevel();//Integer.parseInt(android.os.Build.VERSION.SDK);
+    	int apiLevel = getApiLevel();
     	if (apiLevel >= 11) {
     		
     		String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
@@ -1191,7 +1206,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		String sortOrder = null;
 
     		CursorLoader cursorLoader = new CursorLoader(
-    		        mContext,//AmusementPark.getAppContext(),
+    		        mContext,
     		        imageUri, 
     		        proj, 
     		        selection, 
@@ -1237,7 +1252,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     
     public static File convertVideoUriToFile (Uri videoUri, Activity activity)  {
     	
-    	int apiLevel = getApiLevel();//Integer.parseInt(android.os.Build.VERSION.SDK);
+    	int apiLevel = getApiLevel();
     	if (apiLevel >= 11) {
     		
     		String [] proj={MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
@@ -1246,7 +1261,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		String sortOrder = null;
 
     		CursorLoader cursorLoader = new CursorLoader(
-    		        mContext,//AmusementPark.getAppContext(),
+    		        mContext,
     		        videoUri, 
     		        proj, 
     		        selection, 
@@ -1263,7 +1278,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	} else {
     		
     		Cursor cursor = null;
-    		/*Context context = AmusementPark.getAppContext();*/
+    		
     		try {
     		    String [] proj={MediaStore.Video.Media.DATA, MediaStore.Video.Media._ID};
     		    cursor = activity.managedQuery(videoUri,
@@ -1304,7 +1319,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 		} else if (requestCode == CAMERA_VID_REQUESTED) {
 			if(resultCode == RESULT_OK) {
 				File f = convertVideoUriToFile(videoUri, this);
-				videos.add(f);
+				videos.add(f); Log.e("vids", "video size: " + videos.size());
 				//videoArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
@@ -1342,28 +1357,39 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			Log.e("Pics", "putSessionData success: " + hasPut);
 			
 			int pic = pictureArray.size();
+			int vid = videoArray.size();
 			
 			while(pic > 0) {
-				
-				boolean hUp = rapi.uploadPictureToSession(pictureArray.get(pic - 1),
-						experimentInput.getText().toString(), 
-						sessionId, sessionName.getText().toString(), "N/A");
+				boolean hUp;
+				if(nameOfSession.equals(""))
+					hUp = rapi.uploadPictureToSession(pictureArray.get(pic - 1),
+							experimentInput.getText().toString(), 
+							sessionId, "*Session Name Not Provided*", "N/A");
+				else
+					hUp = rapi.uploadPictureToSession(pictureArray.get(pic - 1),
+							experimentInput.getText().toString(), 
+							sessionId, sessionName.getText().toString(), "N/A");
 				Log.e("Pics", "has uploaded: " + hUp);
 				pic--;
 				
 			}
 			pictureArray.clear();
-			while(videoArray.size() > 0) {
-				/* this still needs to be created in rapi!!
-					  
-				rapi.uploadVideoToSession(videoArray.get(0), experimentInput.getText().toString(), 
-						sessionId, sessionName.getText().toString(), "N/A");
-					
-			  	videoArray.remove(0);
-					  
-				  
-				 */
+			
+			while(vid > 0) {
+				/* THIS DOESNT WORK IN RAPI YET */
+				boolean hUp;
+				if(nameOfSession.equals(""))
+					hUp = rapi.uploadVideoToSession(videoArray.get(vid - 1),
+							experimentInput.getText().toString(), 
+							sessionId, "*Session Name Not Provided*", "N/A");
+				else
+					hUp = rapi.uploadVideoToSession(videoArray.get(vid - 1),
+							experimentInput.getText().toString(), 
+							sessionId, sessionName.getText().toString(), "N/A");
+				Log.e("Vids", "has uploaded: " + hUp);
+				vid--;
 			}
+			videoArray.clear();
 				
 		}
 		

@@ -78,11 +78,10 @@ public class LoginActivity {
             	   .setPositiveButton("Login", new DialogInterface.OnClickListener() {
             		   public void onClick(DialogInterface dialog, int id) {
             			   success = rapi.login(usernameInput.getText().toString(), passwordInput.getText().toString());
-            			   Log.w("CNCTN", "user: " + usernameInput.getText().toString());
-            			   Log.w("CNCTN", "pass: " + passwordInput.getText().toString());
-            			               			               			   
+                       			               			   
             			   if (success) {
             				   AmusementPark.loginName = usernameInput.getText().toString();
+                			   AmusementPark.loginPass = passwordInput.getText().toString();
             				   loginSuccess.sendToTarget();
             				   dialog.dismiss();
             			   } else {
