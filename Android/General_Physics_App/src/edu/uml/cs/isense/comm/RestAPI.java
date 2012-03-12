@@ -147,7 +147,7 @@ public class RestAPI {
 	
 	public Boolean uploadVideoToSession(File video, String eid, int sid, String vid_name, String vid_desc) {
 		
-try {
+		try {
 			
 			byte[] data = getBytesFromFile(video);
 			
@@ -161,7 +161,6 @@ try {
 			conn.setDoOutput(true);
 			conn.setUseCaches(false);
 			conn.setRequestMethod("POST");
-			
 			conn.setRequestProperty("Connection", "Keep-Alive");
 			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
 			
@@ -268,7 +267,6 @@ try {
 		
 	}
 	
-	/** KILLED WITH LOGS!  REMOVE BEFORE FINISHING!!!!!!!!!!!!!*/
 	public Boolean uploadPictureToSession(File image, String eid, int sid, String img_name, String img_desc) {
 		//String target = "?method=uploadImageToSession&session_key=" + session_key + "&sid=" + sid + "&img_name=" + img_name + "&img_desc=" + img_desc;
 		
@@ -504,7 +502,7 @@ try {
 		}
 		
 	}
-	/* honk. mike killed this with log's to debug. remember to remove them */
+	
 	public Boolean login(String username, String password) {
 		String url = "method=login&username=" + URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password);
 		
@@ -526,24 +524,20 @@ try {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 				connection = "NONE";
-				Log.e("CNCTN", "MalformedURLException: " + e);
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
 				connection = "NONE";
-				Log.e("CNCTN", "IOException: " + e);
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
 				connection = "600";
-				Log.e("CNCTN", "Exception: " + e);
 				return false;
 			}
 			
 			return true;
 		}
 		connection = "NONE";
-		Log.e("CNCTN", "Never connected!");
 		return false;
 	}
 	

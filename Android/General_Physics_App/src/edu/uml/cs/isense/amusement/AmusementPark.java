@@ -1423,7 +1423,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	        len = 0; len2 = 0;
 	        
 	        Toast.makeText(AmusementPark.this, "Upload Success", Toast.LENGTH_SHORT).show();
-	        
+	        picCount.setText("Pictures and Videos Taken: 0");
 	        showDialog(DIALOG_SUMMARY);
 	        
 	    }
