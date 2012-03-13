@@ -118,7 +118,7 @@ public class LoginActivity {
 		builder
 			.setTitle("Login Failed")
 			.setMessage(message)
-			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					msg.sendToTarget();
