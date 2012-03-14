@@ -541,6 +541,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		File f = videos.get(i);
     		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".3gp");
     		f.renameTo(newFile);
+    		videoArray.add(newFile);
     	}
     	
     	videos.clear();
@@ -1297,15 +1298,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {				
 	            File f = convertImageUriToFile(imageUri, this);
 	            pictures.add(f);
-	            //pictureArray.add(f);
-				mediaCount++;
+	            mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
 		} else if (requestCode == CAMERA_VID_REQUESTED) {
 			if(resultCode == RESULT_OK) {
 				File f = convertVideoUriToFile(videoUri, this);
 				videos.add(f);
-				//videoArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1342,28 +1341,26 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			Log.e("Pics", "putSessionData success: " + hasPut);
 			
 			int pic = pictureArray.size();
-			
 			while(pic > 0) {
-				
 				boolean hUp = rapi.uploadPictureToSession(pictureArray.get(pic - 1),
 						experimentInput.getText().toString(), 
 						sessionId, sessionName.getText().toString(), "N/A");
 				Log.e("Pics", "has uploaded: " + hUp);
 				pic--;
-				
 			}
 			pictureArray.clear();
-			while(videoArray.size() > 0) {
-				/* this still needs to be created in rapi!!
-					  
-				rapi.uploadVideoToSession(videoArray.get(0), experimentInput.getText().toString(), 
-						sessionId, sessionName.getText().toString(), "N/A");
+			
+			int vid = videoArray.size();
+			while(vid > 0) {
+				/* this still needs to be created in rapi!!*/
+				boolean vUp = rapi.uploadVideo(videoArray.get(vid - 1), 
+						experimentInput.getText().toString(), 
+						sessionName.getText().toString(), "N/A");
 					
-			  	videoArray.remove(0);
-					  
-				  
-				 */
+			  	Log.e("Vids", "have uploaded: " + vUp);
+			  	vid--;
 			}
+			videoArray.clear();
 				
 		}
 		

@@ -1313,6 +1313,243 @@ public class RestAPI {
 			return false;
 		}
 	}
+	/*
+	 * Additional method by Mike S. & Jeremy P.
+	 */
+	/** Won't work on the current version of iSense! */
+	 public Boolean uploadVideoToSession(File video, String eid, int sid, String vid_name, String vid_desc) {
+	 
+		//String target = "?method=uploadVideoToSession&session_key=" + session_key + "&sid=" + sid + "&vid_name=" + vid_name + "&vid_desc=" + vid_desc;
+		try {
+			
+			byte[] data = getBytesFromFile(video);
+			
+			String lineEnd = "\r\n";
+			String twoHyphens = "--";
+			String boundary = "*****";
+			
+			URL connectURL = new URL(this.base_url);
+			HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			conn.setUseCaches(false);
+			conn.setRequestMethod("POST");
+						
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
+						
+			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+						
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"method\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes("uploadVideoToSession");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+			
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"session_key\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(session_key);
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"eid\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(eid + "");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+			
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"sid\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(sid + "");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"vid_name\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(vid_name.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"vid_description\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(vid_desc.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+			
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			// write content header
+			dos.writeBytes("Content-Disposition: form-data; name=\"video\"; filename=\"" + video.getName() + "\"");
+			dos.writeBytes(lineEnd);
+			dos.writeBytes("Content-Type: video/3gp" + lineEnd);
+			dos.writeBytes(lineEnd);
+				
+			// create a buffer of maximum size
 	
+			dos.write(data, 0, data.length);
+	
+			// send multipart form data necesssary after file data...
+	
+			dos.writeBytes(lineEnd);
+			dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+	
+			// close streams
+			dos.flush();
+			dos.close();
+						
+			try {
+				DataInputStream inStream = new DataInputStream(conn.getInputStream());
+				String str;
+				
+				while ((str = inStream.readLine()) != null) {
+					Log.d("rapi", "Server Response" + str);
+				}
+				inStream.close();
+				return true;
+			} catch (IOException ioex) {
+				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
+				return false;
+			}
+			
+		} catch (Exception e) {
+			Log.e("Vid", ""+e);
+			return false;
+		}
+		
+	}
+	
+	public Boolean uploadVideo(File video, String eid, String vid_name, String vid_desc) {
+		//String target = "?method=uploadVideoToExperiment&session_key=" + session_key + "&eid=" + eid + "&vid_name=" + vid_name + "&vid_desc=" + vid_desc;
+		
+		try {
+			byte[] data = getBytesFromFile(video);
+			
+			String lineEnd = "\r\n";
+			String twoHyphens = "--";
+			String boundary = "*****";
+			
+			URL connectURL = new URL(this.base_url);
+			HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			conn.setUseCaches(false);
+			conn.setRequestMethod("POST");
+	
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
+	
+			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+	
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"method\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes("uploadVideoToExperiment");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"session_key\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(session_key);
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"eid\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(eid + "");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"vid_name\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(vid_name.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"vid_description\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(vid_desc.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			// write content header
+			dos.writeBytes("Content-Disposition: form-data; name=\"video\"; filename=\"" + video.getName() + "\"");
+			dos.writeBytes(lineEnd);
+			dos.writeBytes("Content-Type: video/3gp" + lineEnd);
+			dos.writeBytes(lineEnd);
+	
+			// create a buffer of maximum size
+	
+			dos.write(data, 0, data.length);
+	
+			// send multipart form data necesssary after file data...
+	
+			dos.writeBytes(lineEnd);
+			dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+	
+			// close streams
+			dos.flush();
+			dos.close();
+		
+			try {
+				DataInputStream inStream = new DataInputStream(conn.getInputStream());
+				String str;
+
+				while ((str = inStream.readLine()) != null) {
+					Log.d("rapi", "Server Response" + str);
+				}
+				inStream.close();
+				return true;
+			} catch (IOException ioex) {
+				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
+				return false;
+			}
+			
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
 
