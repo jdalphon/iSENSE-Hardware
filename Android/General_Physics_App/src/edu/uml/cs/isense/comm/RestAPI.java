@@ -144,40 +144,27 @@ public class RestAPI {
 	    is.close();
 	    return bytes;
 	}
-	/** KILLED WITH LOGS!  REMOVE BEFORE FINISHING!!!!!!!!!!!!!*/
-	public Boolean uploadPictureToSession(File image, String eid, int sid, String img_name, String img_desc) {
-		//String target = "?method=uploadImageToSession&session_key=" + session_key + "&sid=" + sid + "&img_name=" + img_name + "&img_desc=" + img_desc;
-		int i = 0; 
-		Log.e("iCount", "i = " + i++);
+	
+	public Boolean uploadVideoToSession(File video, String eid, int sid, String vid_name, String vid_desc) {
+		
 		try {
-			Log.e("iCount", "i = " + i++);
-			byte[] data = getBytesFromFile(image); /* FAILS HERE!!! HONK HONK BLARGH BLARGH!!!*/
-			Log.e("iCount", "i = " + i++);
+			
+			byte[] data = getBytesFromFile(video);
 			
 			String lineEnd = "\r\n";
 			String twoHyphens = "--";
 			String boundary = "*****";
 			
 			URL connectURL = new URL(this.base_url);
-			Log.e("iCount", "i = " + i++);
 			HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
-			Log.e("iCount", "i = " + i++);
 			conn.setDoInput(true);
-			Log.e("iCount", "i = " + i++);
 			conn.setDoOutput(true);
-			Log.e("iCount", "i = " + i++);
 			conn.setUseCaches(false);
-			Log.e("iCount", "i = " + i++);
 			conn.setRequestMethod("POST");
-			Log.e("iCount", "i = " + i++);
-			
 			conn.setRequestProperty("Connection", "Keep-Alive");
-			Log.e("iCount", "i = " + i++);
 			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
-			Log.e("iCount", "i = " + i++);
 			
 			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
-			Log.e("iCount", "i = " + i++);
 			
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -188,7 +175,6 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -199,7 +185,6 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -210,7 +195,6 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 			
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -221,37 +205,33 @@ public class RestAPI {
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			dos.writeBytes("Content-Disposition: form-data; name=\"img_name\"" + lineEnd);
 			dos.writeBytes(lineEnd);
 			// insert submit
-			dos.writeBytes(img_name.replace(" ", "+"));
+			dos.writeBytes(vid_name.replace(" ", "+"));
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 
 			// submit header
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			dos.writeBytes("Content-Disposition: form-data; name=\"img_description\"" + lineEnd);
 			dos.writeBytes(lineEnd);
 			// insert submit
-			dos.writeBytes(img_desc.replace(" ", "+"));
+			dos.writeBytes(vid_desc.replace(" ", "+"));
 			// submit closer
 			dos.writeBytes(lineEnd);
 			dos.flush();
-			Log.e("iCount", "i = " + i++);
 
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			// write content header
-			dos.writeBytes("Content-Disposition: form-data; name=\"image\"; filename=\"" + image.getName() + "\"");
+			dos.writeBytes("Content-Disposition: form-data; name=\"image\"; filename=\"" + video.getName() + "\"");
 			dos.writeBytes(lineEnd);
 			dos.writeBytes("Content-Type: image/jpeg" + lineEnd);
 			dos.writeBytes(lineEnd);
-			Log.e("iCount", "i = " + i++);
 	
 			// create a buffer of maximum size
 	
@@ -265,19 +245,139 @@ public class RestAPI {
 			// close streams
 			dos.flush();
 			dos.close();
-			Log.e("iCount", "i = " + i++);
 			
 			try {
 				DataInputStream inStream = new DataInputStream(conn.getInputStream());
 				String str;
-				Log.e("iCount", "i = " + i++);
 
 				while ((str = inStream.readLine()) != null) {
-					Log.e("iCount", "i = " + i++);
 					Log.d("rapi", "Server Response" + str);
 				}
 				inStream.close();
-				Log.e("iCount", "i = " + i++);
+				return true;
+			} catch (IOException ioex) {
+				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
+				return false;
+			}
+			
+		} catch (Exception e) {
+			Log.e("Pic", ""+e);
+			return false;
+		}
+		
+	}
+	
+	public Boolean uploadPictureToSession(File image, String eid, int sid, String img_name, String img_desc) {
+		//String target = "?method=uploadImageToSession&session_key=" + session_key + "&sid=" + sid + "&img_name=" + img_name + "&img_desc=" + img_desc;
+		
+		try {
+			
+			byte[] data = getBytesFromFile(image);
+			
+			String lineEnd = "\r\n";
+			String twoHyphens = "--";
+			String boundary = "*****";
+			
+			URL connectURL = new URL(this.base_url); Log.e("url", "url: " + this.base_url);
+			HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			conn.setUseCaches(false);
+			conn.setRequestMethod("POST");
+			
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			conn.setRequestProperty("Content-Type", "multipart/form-data, boundary=" + boundary);
+			Log.e("url", "conn: " + conn);
+			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+			
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"method\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes("uploadImageToSession");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"session_key\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(session_key);
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"eid\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(eid + "");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+			
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"sid\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(sid + "");
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"img_name\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(img_name.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			// submit header
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			dos.writeBytes("Content-Disposition: form-data; name=\"img_description\"" + lineEnd);
+			dos.writeBytes(lineEnd);
+			// insert submit
+			dos.writeBytes(img_desc.replace(" ", "+"));
+			// submit closer
+			dos.writeBytes(lineEnd);
+			dos.flush();
+
+			dos.writeBytes(twoHyphens + boundary + lineEnd);
+			// write content header
+			dos.writeBytes("Content-Disposition: form-data; name=\"image\"; filename=\"" + image.getName() + "\"");
+			dos.writeBytes(lineEnd);
+			dos.writeBytes("Content-Type: image/jpeg" + lineEnd);
+			dos.writeBytes(lineEnd);
+	
+			// create a buffer of maximum size
+	
+			dos.write(data, 0, data.length);
+	
+			// send multipart form data necesssary after file data...
+	
+			dos.writeBytes(lineEnd);
+			dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd); Log.e("url", "dos: " + dos);
+	
+			// close streams
+			dos.flush();
+			dos.close();
+			
+			try {
+				DataInputStream inStream = new DataInputStream(conn.getInputStream());
+				String str;
+
+				while ((str = inStream.readLine()) != null) {
+					Log.d("rapi", "Server Response" + str);
+				}
+				inStream.close();
 				return true;
 			} catch (IOException ioex) {
 				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
@@ -402,13 +502,9 @@ public class RestAPI {
 		}
 		
 	}
-	/* honk. mike killed this with log's to debug. remember to remove them */
+	
 	public Boolean login(String username, String password) {
 		String url = "method=login&username=" + URLEncoder.encode(username) + "&password=" + URLEncoder.encode(password);
-		
-		Log.e("CNCTN", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected());
-		Log.e("CNCTN", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected());
-		Log.e("CNCTN", "cnMng: " + connectivityManager);
 		
 		if (connectivityManager != null && ( connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) {
 			try {
@@ -416,14 +512,9 @@ public class RestAPI {
 				String data = makeRequest(url);
 				
 				// Parse JSON Result
-				Log.e("CNCTN", "data: " + data);
-				Log.e("CNCTN", "url: "  + url );
 				JSONObject o = new JSONObject(data);
-				Log.e("CNCTN", "o: " + o);
 				session_key = o.getJSONObject("data").getString("session");
-				Log.e("CNCTN", "session_key: " + session_key);
 				uid = o.getJSONObject("data").getInt("uid");
-				Log.e("CNCTN", "uid: " + uid);
 				
 				if (isLoggedIn()) {
 					this.username = username;
@@ -433,24 +524,20 @@ public class RestAPI {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 				connection = "NONE";
-				Log.e("CNCTN", "MalformedURLException: " + e);
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
 				connection = "NONE";
-				Log.e("CNCTN", "IOException: " + e);
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
 				connection = "600";
-				Log.e("CNCTN", "Exception: " + e);
 				return false;
 			}
 			
 			return true;
 		}
 		connection = "NONE";
-		Log.e("CNCTN", "Never connected!");
 		return false;
 	}
 	
@@ -771,9 +858,9 @@ public class RestAPI {
 		
 		if (connectivityManager != null && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
 			try {
-				Log.w("JSON", "url: " + url); //honk
+				
 				String data = makeRequest(url);
-				Log.w("JSON", "data: " + data); //honk
+				
 				// Parse JSON Result
 				JSONObject o = new JSONObject(data);
 				JSONArray a = o.getJSONArray("data");
@@ -1242,13 +1329,6 @@ public class RestAPI {
 	
 	public String makeRequest(String target) throws Exception {
 		
-		
-/* honk */	
-		Log.w("JSON", "Connectivy?     = " + connectivityManager);
-		Log.w("JSON", "Connect Wifi?   = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected());
-		Log.w("JSON", "Connect Mobile? = " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected());
-/*endhonk*/		
-		
 		String output = "{}";
 		
 		String data = target.replace(" ", "+");
@@ -1263,7 +1343,7 @@ public class RestAPI {
 		
 		// Get the status code of the HTTP Request so we can figure out what to do next
 		int status = conn.getResponseCode();
-		Log.w("JSON", "status: " + status); //honk
+	
 		switch(status) {
 								
 			case 200:
@@ -1277,11 +1357,10 @@ public class RestAPI {
 				// Loop through response to build JSON String
 				while((line = br.readLine()) != null) {
 					sb.append(line + "\n");
-					Log.w("JSON", "br line: " + line); //honk
 				}
 			
 				// Set output from response
-				output = sb.toString();		Log.w("JSON", "output: " + output); //honk		
+				output = sb.toString();		
 				break;
 			
 			case 404:
@@ -1302,10 +1381,7 @@ public class RestAPI {
 	 *  Additional method by Mike S.
 	 */
 	public boolean isConnectedToInternet() {
-		
-		Log.e("cnctn", "wifi: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()); //honk
-		Log.e("cnctn", "mobile: " + connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()); //honk
-		
+	
 		if(((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
 				((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) {
 			return true;

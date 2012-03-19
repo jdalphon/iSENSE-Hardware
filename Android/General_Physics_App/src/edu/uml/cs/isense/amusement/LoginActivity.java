@@ -78,17 +78,21 @@ public class LoginActivity {
             	   .setPositiveButton("Login", new DialogInterface.OnClickListener() {
             		   public void onClick(DialogInterface dialog, int id) {
             			   success = rapi.login(usernameInput.getText().toString(), passwordInput.getText().toString());
-            			   Log.w("CNCTN", "user: " + usernameInput.getText().toString());
-            			   Log.w("CNCTN", "pass: " + passwordInput.getText().toString());
-            			               			               			   
+                       			               			   
             			   if (success) {
             				   AmusementPark.loginName = usernameInput.getText().toString();
+                			   AmusementPark.loginPass = passwordInput.getText().toString();
             				   loginSuccess.sendToTarget();
             				   dialog.dismiss();
             			   } else {
             				   showFailure(h);
             				   dialog.dismiss();
             			   }
+            			   dialog.dismiss();
+            		   }
+            	   })
+            	   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            		   public void onClick(DialogInterface dialog, int id) {
             			   dialog.dismiss();
             		   }
             	   })
@@ -119,7 +123,7 @@ public class LoginActivity {
 		builder
 			.setTitle("Login Failed")
 			.setMessage(message)
-			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					msg.sendToTarget();
