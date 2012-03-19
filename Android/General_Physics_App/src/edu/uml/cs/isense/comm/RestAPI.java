@@ -1548,6 +1548,7 @@ public class RestAPI {
 			}
 			
 		} catch (Exception e) {
+			Log.e("Upload Vid", ""+e);
 			return false;
 		}
 	}
