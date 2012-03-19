@@ -464,8 +464,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public void finishFile() {
     	
     	try {
-            out.close();
-            gpxwriter.close();
+    		if(out != null)
+    			out.close();
+            if(gpxwriter != null)
+            	gpxwriter.close();
             toastSuccess = true;
     	} catch (IOException e) {
     	    toastSuccess = false;
@@ -851,7 +853,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    case DIALOG_CHOICE:
 	    	
 			builder.setTitle("Select An Action:")
-	    	.setMessage("Would you like to upload your data, pictures, and videos to iSENSE?")
+	    	.setMessage("Would you like to upload your data and media to iSENSE?")
 	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 	    		public void onClick(DialogInterface dialoginterface,int i) {
 	    			

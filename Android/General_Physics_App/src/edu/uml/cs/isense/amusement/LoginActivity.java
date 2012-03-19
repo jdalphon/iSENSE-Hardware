@@ -91,6 +91,11 @@ public class LoginActivity {
             			   dialog.dismiss();
             		   }
             	   })
+            	   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            		   public void onClick(DialogInterface dialog, int id) {
+            			   dialog.dismiss();
+            		   }
+            	   })
             	   .setCancelable(true);
             	   
              
