@@ -18,17 +18,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.util.Log;
 import edu.uml.cs.isense.objects.Experiment;
 import edu.uml.cs.isense.objects.ExperimentField;
 import edu.uml.cs.isense.objects.Item;
 import edu.uml.cs.isense.objects.Person;
 import edu.uml.cs.isense.objects.Session;
 import edu.uml.cs.isense.objects.SessionData;
-
-import android.content.Context;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.util.Log;
 
 /**
  * This class handles all the communications with the API provided by the website.  ALl functions are blocking and self caching.
@@ -145,7 +144,7 @@ public class RestAPI {
 	    return bytes;
 	}
 	
-	public Boolean uploadVideoToSession(File video, String eid, int sid, String vid_name, String vid_desc) {
+	public Boolean uploadVideo(File video, String eid, int sid, String vid_name, String vid_desc) {
 		
 		try {
 			
