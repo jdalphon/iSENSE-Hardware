@@ -72,6 +72,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     private String data;
     
     private int count = 0;
+    private int sessionId = -1;
     
     private int    elapsedMillis  =  0 ;
     private int    totalMillis    =  0 ;
@@ -79,7 +80,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     private MediaPlayer mMediaPlayer;
     private int dataPointCount = 0;
     
-    RestAPI rapi ;
+    RestAPI rapi = null;
     
     String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
     DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
@@ -109,6 +110,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     public static String toSendOut = "";
     private static String loginName = "accelapp";
     private static String loginPass = "ecgrul3s";
+    
+    
     private static String experimentId = "387";
     public static JSONArray dataSet;
     
@@ -157,8 +160,13 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
         }
        
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
-        rapi.login(loginName, loginPass);
         
+        boolean Login;
+        if (rapi != null) {
+           	while ((Login = rapi.login(loginName, loginPass)) == false) {
+        		Log.d("Login", "Login in successful: " + Login);
+        	}
+        } else Toast.makeText(mContext, "OMG", Toast.LENGTH_SHORT);
         
         mHandler = new Handler();
         
@@ -199,7 +207,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 					
 					} else {
 						
-						dataSet = new JSONArray();
 						elapsedMillis = 0; totalMillis    = 0;
 						len = 0; len2 = 0; dataPointCount = 0;
 						i   = 0;
@@ -265,7 +272,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 											elapsedMillis + "\n";*/
 									
 									JSONArray dataJSON = new JSONArray();
-									
+								    JSONArray dataSetNew = new JSONArray();
+								    
 									try {
 										
 										/* Accel-x    */ dataJSON.put(toThou.format(accel[0]));
@@ -279,9 +287,11 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 										/* Magnetic-y */ dataJSON.put(rawMag[1]);
 										/* Magnetic-z */ dataJSON.put(rawMag[2]);
 										/* Time       */ dataJSON.put(elapsedMillis); 
-										                 
-										dataSet.put(dataJSON);
-									
+										
+										dataSetNew.put(dataJSON);
+										dataSet = dataSetNew;
+										Log.d("DataSet", "DataSet" + dataSet.toString());
+										
 									} catch (JSONException e) {
 										e.printStackTrace();
 									}
@@ -559,7 +569,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 		@Override
 		public void run() {
 		
-			int sessionId = -1;
+		
 			if (sessionId == -1) {
 				if(nameOfSession.equals("")) {
 					sessionId = rapi.createSession(experimentId, 
@@ -578,7 +588,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 				}
 			} else {
 				boolean appendSuccess = rapi.updateSessionData(sessionId, experimentId, dataSet);
-				Log.d("Upload", "Upload: " + appendSuccess);
+				Log.d("Upload", "Upload Append: " + appendSuccess);
 			}
 			
 			

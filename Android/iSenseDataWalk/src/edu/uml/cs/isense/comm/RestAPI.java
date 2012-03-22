@@ -112,6 +112,8 @@ public class RestAPI {
 				connection = "";
 				String data = makeRequest(url);
 				
+				Log.d("Login","I made a request to login!");
+				
 				// Parse JSON Result
 				JSONObject o = new JSONObject(data);
 				session_key = o.getJSONObject("data").getString("session");
@@ -138,7 +140,7 @@ public class RestAPI {
 			
 			return true;
 		}
-		connection = "NONE";
+		connection = "NONE"; Log.d("login", "connection: "+connection);
 		return false;
 	}
 	
@@ -872,7 +874,6 @@ public class RestAPI {
 		if (connectivityManager != null && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected() || connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
 			try {
 				String data = makeRequest(url);
-				
 				if (data.compareTo("{}") != 0) ret = true;
 				
 			} catch (MalformedURLException e) {
