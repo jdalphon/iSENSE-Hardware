@@ -1,6 +1,8 @@
 package edu.cs.uml.isense.datawalk;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,9 +28,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
@@ -52,6 +58,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
+	private PowerManager mPowerManager;
+	private WakeLock runLock;
 	
 	private Location loc;
 	private float accel[];
@@ -60,59 +68,66 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	private float rawAccel[];
 	private float rawMag[];
 	
-	private static final int INTERVAL = 10000;
-	private static final int DIALOG_SUMMARY = 5;
-	private static final int RECORDING_STOPPED = 9;
-	private static final int DIALOG_NO_GPS = 10;
-	private static final int DIALOG_FORCE_STOP = 11;
-
-    static final public int DIALOG_CANCELED = 0;
-    static final public int DIALOG_OK = 1;
- 
-    private String data;
+	public static String firstName = "";
+    public static String lastInitial = "";
+	    
+    public static final int DIALOG_CANCELED    = 0;
+    public static final int DIALOG_OK          = 1;
     
-    private int count = 0;
-    private int sessionId = -1;
+	private static final int MENU_ITEM_ABOUT   = 2;
+	private static final int DIALOG_VIEW_DATA  = 3;
+	private static final int DIALOG_SUMMARY    = 4;
+	private static final int DIALOG_NEED_NAME  = 5;
+	private static final int DIALOG_NO_GPS     = 6;
+	private static final int DIALOG_FORCE_STOP = 7;
+	private static final int RECORDING_STOPPED = 8;
+	
+	private static final int INTERVAL          = 10000;
     
-    private int    elapsedMillis  =  0 ;
-    private int    totalMillis    =  0 ;
+	private int count          =  0;
+	private int	elapsedMillis  =  0;
+    private int	totalMillis    =  0;
+    private int dataPointCount =  0;
+    private int sessionId      = -1;
     
     private MediaPlayer mMediaPlayer;
-    private int dataPointCount = 0;
-    
+        
     RestAPI rapi = null;
     
     String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
+    String nameOfSession = "";
+    String partialSessionName = "";
+    
     DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
     
-    int i = 0;  int len = 0;  int len2 = 0;
+    int i = 0, len = 0, len2 = 0;
     
     ProgressDialog dia;
     double partialProg = 1.0;
     
-    String nameOfSession = "";
-    String partialSessionName = "";
+    private boolean throughHandler   = false;
     
     static boolean inPausedState     = false;
     static boolean toastSuccess      = false;
-    static boolean useMenu           = true ;
-    static boolean beginWrite        = true ;
     static boolean setupDone         = false;
     static boolean choiceViaMenu     = false;
     static boolean dontToastMeTwice  = false;
     static boolean exitAppViaBack    = false;
     static boolean backWasPressed    = false;
+    static boolean useMenu           = true ;
+    static boolean beginWrite        = true ;
         
     private Handler mHandler;
-    private boolean throughHandler = false;
     
     public static String textToSession = "";
     public static String toSendOut = "";
+    
     private static String loginName = "accelapp";
     private static String loginPass = "ecgrul3s";
-    
-    
     private static String experimentId = "387";
+    private static String baseSessionUrl = "http://isensedev.cs.uml.edu/vis.php?sessions=";
+	private static String sessionUrl = "";
+    
     public static JSONArray dataSet;
     
     static int mheight = 1;
@@ -126,6 +141,9 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
         setContentView(R.layout.main);
         
         mContext = this;
+        
+        mPowerManager = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
+        runLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         
         Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
     	mwidth  = deviceDisplay.getWidth();
@@ -198,14 +216,18 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 						startStop.setText("Hold to Start");
 						 
 						timeTimer.cancel();
-						//count++;
+						
 						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
-						/*if(throughHandler)
-							showDialog(RECORDING_STOPPED);*/
+						if(throughHandler)
+							showDialog(RECORDING_STOPPED);
 					
 						running = false; 
+						
+						if (runLock.isHeld()) runLock.release();
 					
 					} else {
+						
+				        runLock.acquire();
 						
 						elapsedMillis = 0; totalMillis    = 0;
 						len = 0; len2 = 0; dataPointCount = 0;
@@ -229,8 +251,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 									SensorManager.SENSOR_DELAY_FASTEST);
 						}
 						
-						data = "X Acceleration, Y Acceleration, Z Acceleration, Acceleration, " +
-								"Latitude, Longitude, Heading, Magnetic X, Magnetic Y, Magnetic Z, Time\n";
 						running = true;
 						startStop.setText("Hold to Stop");
 			    	
@@ -243,7 +263,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 								elapsedMillis += INTERVAL;
 								totalMillis = elapsedMillis;
 			
-								if(i >= 360) { /*what's the max time for recording?*/
+								if(i >= 360) {
 								
 									timeTimer.cancel();
 									
@@ -258,18 +278,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 								} else {
 								
 									i++; len++; len2++;	
-									
-									/*data =  toThou.format(accel[0]) + ", " + 
-											toThou.format(accel[1]) + ", " + 
-											toThou.format(accel[2]) + ", " +
-											toThou.format(accel[3]) + ", " + 
-											loc.getLatitude() + ", " + 
-											loc.getLongitude() + ", " + 
-											toThou.format(orientation[0]) + ", " + 
-											rawMag[0] + ", " + 
-											rawMag[1] + ", " + 
-											rawMag[2] + ", " + 
-											elapsedMillis + "\n";*/
 									
 									JSONArray dataJSON = new JSONArray();
 								    JSONArray dataSetNew = new JSONArray();
@@ -299,7 +307,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 									mHandler.post(new Runnable() {
 										@Override
 										public void run() {
-											//throughHandler = true;
 											new Task().execute();
 										}
 									});
@@ -337,6 +344,9 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
         loc         = new Location(mLocationManager.getBestProvider(c, true));
         
         mMediaPlayer = MediaPlayer.create(this, R.raw.beep); 
+        
+        if(firstName.length() == 0 || lastInitial.length() == 0)
+        	showDialog(DIALOG_NEED_NAME);
         
     } 
  
@@ -489,29 +499,102 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	         });
 	           
 	    	dialog = builder.create();
+	    	
+	    	if (runLock.isHeld()) runLock.release();
 	    
 	    	break;
 	    	
-	    	case RECORDING_STOPPED:
+	    case RECORDING_STOPPED:
 	    	
-	    	throughHandler = false;
+	    throughHandler = false;
 	    	
-	    	builder.setTitle("Time Up")
-	    	.setMessage("You have been recording data for more than 10 minutes.  For the sake of memory, we have capped your maximum " +
-	    			"recording time at 10 minutes and have stopped recording for you.  Press OK to continue.")
-	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	    		public void onClick(DialogInterface dialoginterface,int i) {
-	    			dialoginterface.dismiss();
-	    			//showDialog(DIALOG_CHOICE);
-	    		}
+	    builder.setTitle("Time Up")
+	    .setMessage("You have been recording data for more than 1 hour.  For the sake of battery usage" +
+	    		"responsibility, we have capped your maximum recording time at 1 hour and have stopped" +
+	    		"recording for you.  Press OK to continue.")
+	    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	    	public void onClick(DialogInterface dialoginterface,int i) {
+	    		dialoginterface.dismiss();
+	    	}
+	    })
+     	  .setCancelable(false);
+	    	
+	    dialog = builder.create();
+	    
+        if (runLock.isHeld()) runLock.release();
+	    
+	    break;
+	    	
+	    case DIALOG_NEED_NAME:
+	    	LoginActivity la = new LoginActivity(mContext);
+	        dialog = la.getDialog(new Handler() {
+			      public void handleMessage(Message msg) { 
+			    	  switch (msg.what) {
+			    	  	case LoginActivity.NAME_SUCCESSFULL:
+			    	  	  break;
+			    	  	case LoginActivity.NAME_CANCELED:
+			    		  break;
+			    	  	case LoginActivity.NAME_FAILED:
+				    	  showDialog(DIALOG_NEED_NAME);
+			    		  break;
+			    	  }
+			      }
+        		});
+                
+	        break;
+	    	
+	    case DIALOG_VIEW_DATA:
+	    	
+	    	builder.setTitle("Web Browser")
+	    	.setMessage("Would you like to view your data on the iSENSE website?")
+	    	.setCancelable(false)
+	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   Intent i = new Intent(Intent.ACTION_VIEW);
+	            	   i.setData(Uri.parse(sessionUrl));
+	            	   startActivity(i);
+	               }
 	    	})
-     	   .setCancelable(false);
-	    	
+	    	.setNegativeButton("No", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	               }
+	    	})
+	        .setCancelable(true);
+	           
 	    	dialog = builder.create();
 	    
 	    	break;
 	    	
+	    case MENU_ITEM_ABOUT:
 	    	
+	    	builder.setTitle("About")
+	    	.setMessage("This app has been solely designed for demonstration at USASEF.  The intended use of this app is for " +
+	    				"users to be able to leave their phone in their pocket while the application runs and uploads data." +
+	    				
+	    				/**Fix this*/
+	    				"When ready, the user shall press the \"Hold to Start\" button to begin recording Y and Z accelerometer " +
+	    				"points as the vehicle slides/drives down the incline.  Data recording will run for 10 seconds, and the user " +
+	    				"will then be prompted to upload their data or throw it away.  Should the user choose to upload the " +
+	    				"data, he or she may then visualize it live on the iSENSE website (isenseproject.org).  The purpose of " +
+	    				"prompting the user for his or her first name/last initial is solely for the identification of his or " +
+	    				"her own sessions on the iSENSE website.  The user is not allowed to exit this app while recording data " +
+	    				"via the back button.  However, if the user presses the home button, this app will pause.  Upon this app " +
+	    				"resuming, the user will notice a dialog box that informs him or her of the action they took to pause the app, " +
+	    				"and the data recording will halt/be thrown away.")
+	    	.setCancelable(false)
+	    	.setNegativeButton("Back", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	               }
+	    	})
+	        .setCancelable(true);
+	           
+	    	dialog = builder.create();
+	    
+	    	break;
+	    
 	    default:
 	    	dialog = null;
 	    	break;
@@ -520,7 +603,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	
 	    int apiLevel = getApiLevel();
 	    if(apiLevel >= 11) {
-	    	dialog.show(); /* works but doesnt center it */
+	    	dialog.show(); /* works but doesn't center it */
 		    	
 		   	lp.copyFrom(dialog.getWindow().getAttributes());
 		   	lp.width = mwidth;
@@ -528,8 +611,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 		   	lp.gravity = Gravity.CENTER_VERTICAL;
 		   	lp.dimAmount=0.7f;
 		   	
-		   	dialog.getWindow().setAttributes(lp);
-		   	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 		   	dialog.getWindow().setAttributes(lp);
 		    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 		    	
@@ -569,6 +650,11 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 		@Override
 		public void run() {
 		
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy, HH:mm:ss");
+			Date dt = new Date();
+			String dateString = sdf.format(dt);
+		    
+			nameOfSession = firstName + " " +  lastInitial + ". - " + dateString;
 		
 			if (sessionId == -1) {
 				if(nameOfSession.equals("")) {
@@ -590,9 +676,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 				boolean appendSuccess = rapi.updateSessionData(sessionId, experimentId, dataSet);
 				Log.d("Upload", "Upload Append: " + appendSuccess);
 			}
-			
-			
-			
+		
 		}
 		
 	};
