@@ -44,16 +44,15 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 import edu.cs.uml.isense.R;
 import edu.uml.cs.isense.comm.RestAPI;
 
 public class DataWalk extends Activity implements SensorEventListener, LocationListener {
 
+	public static Boolean running = false;
+	
 	private Button startStop;
-	private TextView values;
-	private Boolean running = false;
 	private Vibrator vibrator;
 	
 	private SensorManager mSensorManager;
@@ -74,20 +73,16 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     public static final int DIALOG_CANCELED    = 0;
     public static final int DIALOG_OK          = 1;
     
-	private static final int MENU_ITEM_ABOUT   = 2;
+    private static final int MENU_ITEM_ABOUT   = 2;
 	private static final int DIALOG_VIEW_DATA  = 3;
-	private static final int DIALOG_SUMMARY    = 4;
-	private static final int DIALOG_NEED_NAME  = 5;
-	private static final int DIALOG_NO_GPS     = 6;
-	private static final int DIALOG_FORCE_STOP = 7;
-	private static final int RECORDING_STOPPED = 8;
+	private static final int DIALOG_NEED_NAME  = 4;
+	private static final int DIALOG_NO_GPS     = 5;
+	private static final int DIALOG_FORCE_STOP = 6;
+	private static final int RECORDING_STOPPED = 7;
 	
 	private static final int INTERVAL          = 10000;
     
-	private int count          =  0;
 	private int	elapsedMillis  =  0;
-    private int	totalMillis    =  0;
-    private int dataPointCount =  0;
     private int sessionId      = -1;
     
     private MediaPlayer mMediaPlayer;
@@ -189,15 +184,11 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
         mHandler = new Handler();
         
         startStop = (Button) findViewById(R.id.startStop);
-              
-        values = (TextView) findViewById(R.id.values);
-        
-        
+                
         /* This block useful for if onBackPressed - retains some things from previous session */
         if(running)
     		showDialog(DIALOG_FORCE_STOP);
-    	   	rapi.login(loginName, loginPass); 
-    	            	
+    	   	rapi.login(loginName, loginPass);    	            	
         
         startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
         startStop.setOnLongClickListener(new OnLongClickListener() {
@@ -213,25 +204,26 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 						
 						mSensorManager.unregisterListener(DataWalk.this);
 						running = false;
-						startStop.setText("Hold to Start");
+						startStop.setText(getString(R.string.startPrompt));
 						 
 						timeTimer.cancel();
-						
-						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
-						if(throughHandler)
-							showDialog(RECORDING_STOPPED);
-					
 						running = false; 
+					
+						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
 						
+						if (throughHandler) showDialog(RECORDING_STOPPED);
+						else                showDialog(DIALOG_VIEW_DATA);
+							
 						if (runLock.isHeld()) runLock.release();
 					
 					} else {
 						
 				        runLock.acquire();
 						
-						elapsedMillis = 0; totalMillis    = 0;
-						len = 0; len2 = 0; dataPointCount = 0;
-						i   = 0;
+						elapsedMillis = 0;
+						len  = 0; 
+						len2 = 0;
+						i    = 0;
 						
 						try {
 							Thread.sleep(100);
@@ -252,17 +244,14 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 						}
 						
 						running = true;
-						startStop.setText("Hold to Stop");
+						startStop.setText(getString(R.string.stopPrompt));
 			    	
 						timeTimer = new Timer();
 						timeTimer.scheduleAtFixedRate(new TimerTask() {
 							public void run() {
 							
-								dataPointCount++;
-								count = 0;
 								elapsedMillis += INTERVAL;
-								totalMillis = elapsedMillis;
-			
+											
 								if(i >= 360) {
 								
 									timeTimer.cancel();
@@ -406,23 +395,11 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		
-		DecimalFormat oneDigit = new DecimalFormat("#,##0.0");
-
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 			rawAccel = event.values.clone();
 			accel[0] = event.values[0];
 			accel[1] = event.values[1];
 			accel[2] = event.values[2];
-			
-			String xPrepend = accel[0] > 0 ? "+" : "";
-			String yPrepend = accel[1] > 0 ? "+" : "";
-			String zPrepend = accel[2] > 0 ? "+" : "";
-
-			if (count == 0) {
-				values.setText("X: " + xPrepend + oneDigit.format(accel[0]) + ", Y: " + 
-						yPrepend + oneDigit.format(accel[1]) + ", Z: " + 
-						zPrepend + oneDigit.format(accel[2]));
-			}
 			
 			accel[3] = (float) Math.sqrt(Math.pow(accel[0], 2) + Math.pow(accel[1], 2) + Math.pow(accel[2], 2));
 
@@ -664,6 +641,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 								"N/A", "N/A", "United States");
 					boolean hasPut = rapi.putSessionData( sessionId, experimentId, dataSet);
 					Log.d("Upload", "Upload Status: "+hasPut);
+					
+					sessionUrl = baseSessionUrl + sessionId;
 				} else {
 					sessionId = rapi.createSession(experimentId, 
 							nameOfSession, 
@@ -671,6 +650,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 							"N/A", "N/A", "United States");
 					boolean hasPut = rapi.putSessionData( sessionId, experimentId, dataSet);
 					Log.d("Upload", "Upload Status: "+hasPut);
+					
+					sessionUrl = baseSessionUrl + sessionId;
 				}
 			} else {
 				boolean appendSuccess = rapi.updateSessionData(sessionId, experimentId, dataSet);
