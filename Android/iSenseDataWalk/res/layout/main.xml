@@ -8,42 +8,25 @@
     android:baselineAligned="false">
     
     <ImageView android:id="@+id/ImageViewLogo"
-	    android:contentDescription="iSense Logo"
+	    android:contentDescription="@+string/logoDescription"
 		android:layout_width="fill_parent" 
 		android:background="@android:color/white"
 		android:src="@drawable/logo"
 		android:layout_height="wrap_content"
 		android:scaleType="center"/>
 	
-	<LinearLayout android:orientation="vertical"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:background="@android:color/black">
-
-	<TextView android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/values"
-		android:text="X: , Y: , Z:"
-		android:textSize="18dip"
-		android:textStyle="bold"
-		android:background="@android:color/black"
-		android:textColor="@android:color/white"
-		android:layout_gravity="center_horizontal"/>
-			
-	</LinearLayout>
-	
 	<LinearLayout
 	    android:layout_height="fill_parent"
 	    android:layout_width="fill_parent">	
 	    
-		<Button android:text="Hold to Start" 
+		<Button android:text="@+string/startPrompt" 
 			android:textSize="30dip"
 			android:id="@+id/startStop" 
 			android:layout_width="fill_parent" 
 			android:layout_height="fill_parent"
 			android:layout_marginLeft="20dp"
 			android:layout_marginRight="20dp"
-			android:layout_marginTop="20dp"
+			android:layout_marginTop="10dp"
 			android:layout_marginBottom="20dp"/>
 	</LinearLayout>
 	
