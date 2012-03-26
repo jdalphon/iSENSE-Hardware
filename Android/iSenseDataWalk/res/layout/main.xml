@@ -15,6 +15,22 @@
 		android:layout_height="wrap_content"
 		android:scaleType="center"/>
 	
+	<LinearLayout android:orientation="vertical"
+    		android:layout_width="fill_parent"
+    		android:layout_height="wrap_content"
+    		android:background="@android:color/black">
+
+			<TextView android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/timeElapsed"
+				android:text="Time Elapsed:   seconds"
+				android:textSize="18dip"
+				android:textStyle="bold"
+				android:background="@android:color/black"
+				android:textColor="@android:color/white"
+				android:layout_gravity="center_horizontal"/>
+	</LinearLayout>
+	
 	<LinearLayout
 	    android:layout_height="fill_parent"
 	    android:layout_width="fill_parent">	

@@ -44,6 +44,7 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import edu.cs.uml.isense.R;
 import edu.uml.cs.isense.comm.RestAPI;
@@ -54,6 +55,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	
 	private Button startStop;
 	private Vibrator vibrator;
+	private TextView timeElapsedBox;
 	
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
@@ -78,8 +80,8 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	private static final int DIALOG_NEED_NAME  = 4;
 	private static final int DIALOG_NO_GPS     = 5;
 	private static final int DIALOG_FORCE_STOP = 6;
-	private static final int RECORDING_STOPPED = 7;
-	
+
+	private static final int TIMER_LOOP        = 1000;
 	private static final int INTERVAL          = 10000;
     
 	private int	elapsedMillis  =  0;
@@ -95,12 +97,10 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     
     DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
     
-    int i = 0, len = 0, len2 = 0;
+    int i = 0;
     
     ProgressDialog dia;
     double partialProg = 1.0;
-    
-    private boolean throughHandler   = false;
     
     static boolean inPausedState     = false;
     static boolean toastSuccess      = false;
@@ -120,7 +120,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
     private static String loginName = "accelapp";
     private static String loginPass = "ecgrul3s";
     private static String experimentId = "387";
-    private static String baseSessionUrl = "http://isensedev.cs.uml.edu/vis.php?sessions=";
+    private static String baseSessionUrl = "http://isensedev.cs.uml.edu/newvis.php?sessions=";
 	private static String sessionUrl = "";
     
     public static JSONArray dataSet;
@@ -184,6 +184,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
         mHandler = new Handler();
         
         startStop = (Button) findViewById(R.id.startStop);
+        timeElapsedBox = (TextView) findViewById(R.id.timeElapsed);
                 
         /* This block useful for if onBackPressed - retains some things from previous session */
         if(running)
@@ -211,8 +212,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 					
 						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
 						
-						if (throughHandler) showDialog(RECORDING_STOPPED);
-						else                showDialog(DIALOG_VIEW_DATA);
+						showDialog(DIALOG_VIEW_DATA);
 							
 						if (runLock.isHeld()) runLock.release();
 					
@@ -221,8 +221,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 				        runLock.acquire();
 						
 						elapsedMillis = 0;
-						len  = 0; 
-						len2 = 0;
 						i    = 0;
 						
 						try {
@@ -251,23 +249,16 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 							public void run() {
 							
 								elapsedMillis += INTERVAL;
-											
-								if(i >= 360) {
-								
-									timeTimer.cancel();
+								i++;
 									
-									mHandler.post(new Runnable() {
+								mHandler.post(new Runnable() {
 										@Override
 										public void run() {
-											throughHandler = true;
-											startStop.performLongClick();
+											timeElapsedBox.setText("Time Elapsed: " + i + " seconds");
 										}
-									});
-								
-								} else {
-								
-									i++; len++; len2++;	
-									
+								});
+							
+								if ((i % 10) == 1) {
 									JSONArray dataJSON = new JSONArray();
 								    JSONArray dataSetNew = new JSONArray();
 								    
@@ -300,14 +291,13 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 										}
 									});
 								}
-							
 							}
-						}, 0, INTERVAL);
+							
+						}, 0, TIMER_LOOP);
 						startStop.getBackground().setColorFilter(0xFF00FF00, PorterDuff.Mode.MULTIPLY);
 					
 					}	return running;
-				
-				
+	
         }
         	
         });
@@ -481,27 +471,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	    
 	    	break;
 	    	
-	    case RECORDING_STOPPED:
-	    	
-	    throughHandler = false;
-	    	
-	    builder.setTitle("Time Up")
-	    .setMessage("You have been recording data for more than 1 hour.  For the sake of battery usage" +
-	    		"responsibility, we have capped your maximum recording time at 1 hour and have stopped" +
-	    		"recording for you.  Press OK to continue.")
-	    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	    	public void onClick(DialogInterface dialoginterface,int i) {
-	    		dialoginterface.dismiss();
-	    	}
-	    })
-     	  .setCancelable(false);
-	    	
-	    dialog = builder.create();
-	    
-        if (runLock.isHeld()) runLock.release();
-	    
-	    break;
-	    	
 	    case DIALOG_NEED_NAME:
 	    	LoginActivity la = new LoginActivity(mContext);
 	        dialog = la.getDialog(new Handler() {
@@ -551,15 +520,15 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	    				"users to be able to leave their phone in their pocket while the application runs and uploads data." +
 	    				
 	    				/**Fix this*/
-	    				"When ready, the user shall press the \"Hold to Start\" button to begin recording Y and Z accelerometer " +
-	    				"points as the vehicle slides/drives down the incline.  Data recording will run for 10 seconds, and the user " +
-	    				"will then be prompted to upload their data or throw it away.  Should the user choose to upload the " +
-	    				"data, he or she may then visualize it live on the iSENSE website (isenseproject.org).  The purpose of " +
+	    				"When ready, the user shall press the \"Hold to Start\" button to begin recording" +
+	    				"points while they walk around.  Data recording will occur and upload every 10 seconds." +
+	    				"When the user is finished with his/her walk, he or she may press the \"Hold to Stop\" button," +
+	    				"and will be prompted to visualize the data live on the iSENSE website (isenseproject.org).  The purpose of " +
 	    				"prompting the user for his or her first name/last initial is solely for the identification of his or " +
-	    				"her own sessions on the iSENSE website.  The user is not allowed to exit this app while recording data " +
-	    				"via the back button.  However, if the user presses the home button, this app will pause.  Upon this app " +
+	    				"her own sessions on the iSENSE website.  The user is not permitted to exit this app while recording data " +
+	    				"via the back button.  However, if the user presses the home button, this app will stop recording.  Upon this app " +
 	    				"resuming, the user will notice a dialog box that informs him or her of the action they took to pause the app, " +
-	    				"and the data recording will halt/be thrown away.")
+	    				"and the data recording will have halted.")
 	    	.setCancelable(false)
 	    	.setNegativeButton("Back", new DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialoginterface, final int id) {
@@ -686,9 +655,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	        
 	    	dia.setMessage("Done");
 	        dia.cancel();
-	        
-	        len = 0; len2 = 0;
-	        
+	   
 	    }
 	}	
 	

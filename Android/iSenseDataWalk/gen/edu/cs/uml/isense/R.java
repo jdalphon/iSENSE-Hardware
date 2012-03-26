@@ -24,7 +24,8 @@ public final class R {
         public static final int layout_root=0x7f060000;
         public static final int nameInput=0x7f060002;
         public static final int nameLabel=0x7f060001;
-        public static final int startStop=0x7f060006;
+        public static final int startStop=0x7f060007;
+        public static final int timeElapsed=0x7f060006;
     }
     public static final class layout {
         public static final int entername=0x7f030000;
