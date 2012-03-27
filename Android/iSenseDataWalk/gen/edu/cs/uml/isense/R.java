@@ -25,7 +25,7 @@ public final class R {
         public static final int nameInput=0x7f060002;
         public static final int nameLabel=0x7f060001;
         public static final int startStop=0x7f060007;
-        public static final int values=0x7f060006;
+        public static final int timeElapsed=0x7f060006;
     }
     public static final class layout {
         public static final int entername=0x7f030000;
@@ -39,7 +39,10 @@ public final class R {
         public static final int eula=0x7f050005;
         public static final int experiments_no_items=0x7f050003;
         public static final int iSenseConfig=0x7f050001;
+        public static final int logoDescription=0x7f050007;
         public static final int otherConfig=0x7f050002;
+        public static final int startPrompt=0x7f050006;
+        public static final int stopPrompt=0x7f050008;
         public static final int updates=0x7f050004;
     }
 }

@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/Users/jpoulin/Jer&apos;s Stuff/Old_iSense/iSENSE/trunk/embedded/Android/assets/apache-mime4j-0.6.jar"/>
+	<classpathentry kind="lib" path="/Users/jpoulin/Jer&apos;s Stuff/iSenseGit/iSENSE-Hardware/Android/River_Walk_App/apache-mime4j-0.6.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -183,5 +183,8 @@
 		http://isense.cs.uml.edu/\n
 		
 	</string>
+	<string name="startPrompt">Hold to Start</string>
+	<string name="logoDescription">iSense Logo</string>
+	<string name="stopPrompt">Hold to Stop</string>
 
 </resources>
