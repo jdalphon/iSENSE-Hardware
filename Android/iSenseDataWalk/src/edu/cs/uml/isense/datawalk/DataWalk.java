@@ -518,8 +518,6 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	    	builder.setTitle("About")
 	    	.setMessage("This app has been solely designed for demonstration at USASEF.  The intended use of this app is for " +
 	    				"users to be able to leave their phone in their pocket while the application runs and uploads data." +
-	    				
-	    				/**Fix this*/
 	    				"When ready, the user shall press the \"Hold to Start\" button to begin recording" +
 	    				"points while they walk around.  Data recording will occur and upload every 10 seconds." +
 	    				"When the user is finished with his/her walk, he or she may press the \"Hold to Stop\" button," +
@@ -637,7 +635,7 @@ public class DataWalk extends Activity implements SensorEventListener, LocationL
 	    	
 	        dia = new ProgressDialog(DataWalk.this);
 	        dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-	        dia.setMessage("Please wait while your data is uploaded to iSENSE...");
+	        dia.setMessage("Uploading data to iSENSE...");
 	        dia.setCancelable(false);
 	        dia.show();
 	        
