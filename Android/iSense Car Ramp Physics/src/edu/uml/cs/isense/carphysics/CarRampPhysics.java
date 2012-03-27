@@ -55,7 +55,6 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.cs.uml.isense.datawalk.LoginActivity;
@@ -66,7 +65,8 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	private static String experimentNumber = "386";        // HARD CODED
 	private static String userName         = "accelapp";   // HARD CODED
 	private static String password         = "ecgrul3s";   // HARD CODED
-	private static String baseSessionUrl = "http://isensedev.cs.uml.edu/vis.php?sessions=";
+	private static String baseSessionUrl   = "http://isensedev.cs.uml.edu/newvis.php?sessions=";
+	private static String marketUrl        = "https://play.google.com/store/apps/developer?id=UMass+Lowell";
 	private static String sessionUrl = "";
 	
 	private Button startStop;
@@ -91,6 +91,8 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	private static final int DIALOG_VIEW_DATA  = 4;
 	private static final int MENU_ITEM_ABOUT   = 5;
 	private static final int MENU_ITEM_EULA    = 6;
+	private static final int DIALOG_NO_CONNECT = 7;
+	private static final int DIALOG_EXPIRED    = 8;
 	//private static final int EXPERIMENT_CODE = ;
 	
     static final public int DIALOG_CANCELED = 0;
@@ -108,20 +110,16 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
     
     private boolean timeHasElapsed = false;
     private boolean usedHomeButton = false;
+    private boolean appTimedOut    = false;
     
     private MediaPlayer mMediaPlayer;
  
-    private int    elapsedMinutes =  0 ;
-    private int    elapsedSeconds =  0 ;
     private int    elapsedMillis  =  0 ;
-    private int    totalMillis    =  0 ;
     
-    private int dataPointCount = 0;
     
     private String dateString;
     RestAPI rapi ;
     
-    String s_elapsedSeconds, s_elapsedMillis, s_elapsedMinutes;
     DecimalFormat toThou = new DecimalFormat("#,###,##0.000");
     
     int i = 0;  int len = 0;  int len2 = 0;
@@ -129,9 +127,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
     ProgressDialog dia;
     double partialProg = 1.0;
     
-    private EditText sessionName; 
     String nameOfSession = "";
-    String partialSessionName = "";
     
     static int     mediaCount        = 0;
     static boolean inPausedState     = false;
@@ -169,7 +165,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
         
         rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
         
-        rapi.login(userName, password);
+        // where login was
         
         mHandler = new Handler();
         
@@ -207,7 +203,12 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 						count++;
 						startStop.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
 						choiceViaMenu = false;
-						showDialog(DIALOG_CHOICE);
+					
+						if(!appTimedOut)
+							showDialog(DIALOG_CHOICE);
+						else
+							Toast.makeText(CarRampPhysics.this, "Your app has timed out, you may not upload data any longer.", Toast.LENGTH_LONG).show();
+					
 					} else if (usedHomeButton) {
 						setupDone = false;
 						timeHasElapsed = false;
@@ -230,8 +231,8 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 						
 					startStop.setEnabled(false);
 					dataSet = new JSONArray();
-					elapsedMillis = 0; totalMillis    = 0;
-					len = 0; len2 = 0; dataPointCount = 0;
+					elapsedMillis = 0; 
+					len = 0; len2 = 0;
 					i   = 0;
 					
 					try {
@@ -259,10 +260,9 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 					timeTimer.scheduleAtFixedRate(new TimerTask() {
 						public void run() {
 							
-							dataPointCount++;
 							count = (count + 1) % 1;
 							elapsedMillis += INTERVAL;
-							totalMillis = elapsedMillis;
+							
 			
 							if(i >= 200) {
 								
@@ -293,16 +293,8 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 									
 								JSONArray dataJSON = new JSONArray();
 										
-								/* Accel-x    */ //dataJSON.put(toThou.format(accel[0]));
 								/* Accel-y    */ dataJSON.put(toThou.format(accel[1]));
 								/* Accel-z    */ dataJSON.put(toThou.format(accel[2]));
-								/* Accel-Total*/ //dataJSON.put(toThou.format(accel[3]));
-								/* Latitude   */ //dataJSON.put(loc.getLatitude());
-								/* Longitude  */ //dataJSON.put(loc.getLongitude());
-								/* Heading    */ //dataJSON.put(toThou.format(orientation[0]));
-								/* Magnetic-x */ //dataJSON.put(rawMag[0]);
-								/* Magnetic-y */ //dataJSON.put(rawMag[1]);
-								/* Magnetic-z */ //dataJSON.put(rawMag[2]);
 								/* Time       */ dataJSON.put(elapsedMillis); 
 										                 
 								dataSet.put(dataJSON);
@@ -339,36 +331,18 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
         
         mMediaPlayer = MediaPlayer.create(this, R.raw.beep); 
         
-        if(firstName.length() == 0 || lastInitial.length() == 0)
-        	showDialog(DIALOG_NEED_NAME);
-        
-        // Display the End User Agreement
-        /*AlertDialog.Builder adb = new SimpleEula(this).show();
-        if(adb != null) {
-        	Dialog dialog = adb.create();
-        	
-        	Display display = getWindowManager().getDefaultDisplay(); 
-        	int mwidth = display.getWidth();
-        	int mheight = display.getHeight();
-        	
-        	dialog.show();
-        	
-        	int apiLevel = getApiLevel();
-        	if(apiLevel >= 11) {
-
-        		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        	
-        		lp.copyFrom(dialog.getWindow().getAttributes());
-        		lp.width = mwidth;
-        		lp.height = mheight;
-        		lp.gravity = Gravity.CENTER_VERTICAL;
-        		lp.dimAmount=0.7f;
-	    	
-        		dialog.getWindow().setAttributes(lp);
-        		dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        		
+        if(rapi.isConnectedToInternet()) {
+        	boolean success = rapi.login(userName, password);
+        	if(!success) {
+        		showDialog(DIALOG_EXPIRED);
+        		appTimedOut = true;
+        	} else {
+        		if(firstName.length() == 0 || lastInitial.length() == 0)
+                	showDialog(DIALOG_NEED_NAME);
         	}
-        }*/
+        } else {
+        	showDialog(DIALOG_NO_CONNECT);
+        }
         
     } 
 
@@ -403,6 +377,8 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
     	inPausedState = false;
     	if(running)
     		showDialog(DIALOG_FORCE_STOP);
+    	if(!rapi.isConnectedToInternet())
+    		showDialog(DIALOG_NO_CONNECT);
     }
     
     @Override
@@ -530,7 +506,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	    			dialoginterface.dismiss();
 	    			
 	    			if(len == 0 || len2 == 0)
-	    				Toast.makeText(CarRampPhysics.this, "There is no data to upload!", Toast.LENGTH_LONG).show();
+	    				Toast.makeText(CarRampPhysics.this, "There are no data to upload!", Toast.LENGTH_LONG).show();
 	    			
 	    			else {
 			    		if(rapi.isConnectedToInternet())
@@ -546,6 +522,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 			.setNegativeButton("Throw Away", new DialogInterface.OnClickListener() {
      		   	public void onClick(DialogInterface dialoginterface,int i) {
      		   		dialoginterface.dismiss();
+     		   		Toast.makeText(CarRampPhysics.this, "Data thrown away!", Toast.LENGTH_LONG).show();
      		   	} 
      	   	}) 
      	   .setCancelable(true);
@@ -558,7 +535,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	    	
 	    	usedHomeButton = true;
 	    	builder.setTitle("Data Recording Halted")
-	    	.setMessage("You exited the app while data was still being recorded.  Data has stopped recording.")
+	    	.setMessage("You exited the app while data were still being recorded.  Data have stopped recording.")
 	    	.setCancelable(false)
 	    	.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialoginterface, final int id) {
@@ -621,14 +598,14 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	    				"users to place the device down (in the position as instructed on the main screen of this app) " +
 	    				"in a vehicle that is on an incline. " +
 	    				"When ready, the user shall press the \"Hold to Start\" button to begin recording Y and Z accelerometer " +
-	    				"points as the vehicle slides/drives down the incline.  Data recording will run for 10 seconds, and the user " +
-	    				"will then be prompted to upload their data or throw it away.  Should the user choose to upload the " +
-	    				"data, he or she may then visualize it live on the iSENSE website (isenseproject.org).  The purpose of " +
+	    				"points as the vehicle slides/drives down the incline.  Recording data will run for 10 seconds, and the user " +
+	    				"will then be prompted to upload their data set or throw it away.  Should the user choose to upload the " +
+	    				"data set, he or she may then visualize it live on the iSENSE website (isenseproject.org).  The purpose of " +
 	    				"prompting the user for his or her first name/last initial is solely for the identification of his or " +
 	    				"her own sessions on the iSENSE website.  The user is not allowed to exit this app while recording data " +
 	    				"via the back button.  However, if the user presses the home button, this app will pause.  Upon this app " +
 	    				"resuming, the user will notice a dialog box that informs him or her of the action they took to pause the app, " +
-	    				"and the data recording will halt/be thrown away.")
+	    				"and the data recording will halt/be thrown away. Due to security reasons, this app will eventually expire.")
 	    	.setCancelable(false)
 	    	.setNegativeButton("Back", new DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialoginterface, final int id) {
@@ -645,11 +622,90 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	    	
 	    	builder.setTitle("End User License Agreement")
 	    	.setMessage(R.string.eula)
-	    	.setCancelable(false)
 	    	.setNegativeButton("Back", new DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialoginterface, final int id) {
 	            	   dialoginterface.dismiss();
 	               }
+	    	})
+	        .setCancelable(true);
+	           
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_NO_CONNECT:
+	    	
+	    	builder.setTitle("No Connectivity")
+	    	.setMessage("Could not connect to the internet through either wifi or mobile service. " +
+	    			"You will not be able to use this app until either is enabled.")
+	    	.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   ((Activity) mContext).finish();
+	               }
+	    	})
+	    	.setNegativeButton("Try Again", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   try {
+							Thread.sleep(100);
+	            	   } catch (InterruptedException e) {
+							e.printStackTrace();
+	            	   }
+	            	   if(rapi.isConnectedToInternet()) {
+	            		   dialoginterface.dismiss();
+	            		   boolean success = rapi.login(userName, password);
+	            		   if(success)
+	            			   Toast.makeText(CarRampPhysics.this, "Connectivity found!", Toast.LENGTH_SHORT).show();
+	            		   else {
+	            			   showDialog(DIALOG_EXPIRED);
+	            			   appTimedOut = true;
+	            		   }
+	            	   } else {
+	            		   dialoginterface.dismiss();
+	            		   new NotConnectedTask().execute();
+	            	   }
+	               }
+	    	})
+	        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+	    		@Override
+					public void onCancel(DialogInterface dialoginterface) {
+	    				dialoginterface.dismiss();
+	            	    ((Activity)mContext).finish();
+					}
+	    	})
+	        .setCancelable(true);
+	           
+	    	dialog = builder.create();
+	    
+	    	break;
+	    	
+	    case DIALOG_EXPIRED:
+	    	
+	    	builder.setTitle("Timed Out")
+	    	.setMessage("This app has expired and you will no longer be able to use it for safety and security reasons. " +
+	    				"However, you may view our other apps on the Android Marketplace and download them there. Would " +
+	    				"you like to do this?")
+	    	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   ((Activity)mContext).finish();
+	            	   Intent i = new Intent(Intent.ACTION_VIEW);
+	            	   i.setData(Uri.parse(marketUrl));
+	            	   startActivity(i);
+	               }
+	    	})
+	    	.setNegativeButton("No", new DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialoginterface, final int id) {
+	            	   dialoginterface.dismiss();
+	            	   ((Activity)mContext).finish();
+	               }
+	    	})
+	    	.setOnCancelListener(new DialogInterface.OnCancelListener() {
+	    		@Override
+					public void onCancel(DialogInterface dialoginterface) {
+	    				dialoginterface.dismiss();
+	            	    ((Activity)mContext).finish();
+					}
 	    	})
 	        .setCancelable(true);
 	           
@@ -744,13 +800,13 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 						experimentNumber, 
 						"*Session Name Not Provided*", 
 						"Automated Submission Through Android App", 
-						"N/A", "N/A", "United States");
+						"900 F Street Northwest", "Washington, DC", "United States");
 			} else {
 				sessionId = rapi.createSession(
 						experimentNumber, 
 						nameOfSession, 
 						"Automated Submission Through Android App", 
-						"N/A", "N/A", "United States");
+						"900 F Street Northwest", "Washington, DC", "United States");
 			}
 			
 			sessionUrl = baseSessionUrl + sessionId;
@@ -767,7 +823,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	    	
 	        dia = new ProgressDialog(CarRampPhysics.this);
 	        dia.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-	        dia.setMessage("Please wait while your data is uploaded to iSENSE...");
+	        dia.setMessage("Please wait while your data are uploaded to iSENSE...");
 	        dia.setCancelable(false);
 	        dia.show();
 	        
@@ -788,7 +844,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 	        
 	        len = 0; len2 = 0; mediaCount = 0;
 	        
-	        Toast.makeText(CarRampPhysics.this, "Data Has Uploaded Successfully", Toast.LENGTH_SHORT).show();
+	        Toast.makeText(CarRampPhysics.this, "Data have uploaded successfully.", Toast.LENGTH_SHORT).show();
 	        showDialog(DIALOG_VIEW_DATA);
 
 	    }
@@ -812,6 +868,24 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 		}
 	    @Override  protected void onPostExecute(Void voids) {
 	    	dontToastMeTwice = false;
+	    }
+	}
+	
+	private class NotConnectedTask extends AsyncTask <Void, Integer, Void> {
+	    
+		@Override protected Void doInBackground(Void... voids) {
+	    	try {
+	    		Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	        return null;
+		}
+	    @Override  protected void onPostExecute(Void voids) {
+	    	if(rapi.isConnectedToInternet())
+	    		Toast.makeText(CarRampPhysics.this, "Connectivity found!", Toast.LENGTH_SHORT).show();
+	    	else
+	    		showDialog(DIALOG_NO_CONNECT);
 	    }
 	}
     
