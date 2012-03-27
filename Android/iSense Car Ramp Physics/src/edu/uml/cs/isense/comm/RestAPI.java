@@ -1382,8 +1382,8 @@ public class RestAPI {
 	 */
 	public boolean isConnectedToInternet() {
 	
-		if(((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())) ||
-				((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()))) {
+		if((connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) ||
+				(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected())) {
 			return true;
 		} else {
 			return false;
