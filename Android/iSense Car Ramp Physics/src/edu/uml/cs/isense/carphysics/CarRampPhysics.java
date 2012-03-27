@@ -57,7 +57,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import edu.cs.uml.isense.datawalk.LoginActivity;
 import edu.uml.cs.isense.comm.RestAPI;
 
 public class CarRampPhysics extends Activity implements SensorEventListener, LocationListener {
