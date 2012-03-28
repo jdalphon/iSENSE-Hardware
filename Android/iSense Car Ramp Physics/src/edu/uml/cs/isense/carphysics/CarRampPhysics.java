@@ -799,13 +799,13 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 						experimentNumber, 
 						"*Session Name Not Provided*", 
 						"Automated Submission Through Android App", 
-						"900 F Street Northwest", "Washington, DC", "United States");
+						"801 Mt Vernon Place NW", "Washington, DC", "United States");
 			} else {
 				sessionId = rapi.createSession(
 						experimentNumber, 
 						nameOfSession, 
 						"Automated Submission Through Android App", 
-						"900 F Street Northwest", "Washington, DC", "United States");
+						"801 Mt Vernon Place NW", "Washington, DC", "United States");
 			}
 			
 			sessionUrl = baseSessionUrl + sessionId;
