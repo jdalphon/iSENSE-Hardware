@@ -61,10 +61,10 @@ import edu.uml.cs.isense.comm.RestAPI;
 
 public class CarRampPhysics extends Activity implements SensorEventListener, LocationListener {
     
-	private static String experimentNumber = "386";        // HARD CODED
+	private static String experimentNumber = "386";        // HARD CODED [389 for 2.0 testing/unixtime] [399 for actual iSENSE experiment]
 	private static String userName         = "accelapp";   // HARD CODED
 	private static String password         = "ecgrul3s";   // HARD CODED
-	private static String baseSessionUrl   = "http://isensedev.cs.uml.edu/newvis.php?sessions=";
+	private static String baseSessionUrl   = "http://isensedev.cs.uml.edu/newvis.php?sessions="; // [isense.cs.uml.edu.... when ready]
 	private static String marketUrl        = "https://play.google.com/store/apps/developer?id=UMass+Lowell";
 	private static String sessionUrl = "";
 	
@@ -769,7 +769,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
         super.onActivityResult(reqCode, resultCode, data); 
     }
 
-	public void getName(String name) {
+	/*public void getName(String name) {
 		for(int i = 0; i < name.length(); i++) {
 			if(name.charAt(i) != ' ') {
 				firstName += name.charAt(i);
@@ -779,7 +779,7 @@ public class CarRampPhysics extends Activity implements SensorEventListener, Loc
 			}
 		}
 		Toast.makeText(CarRampPhysics.this, firstName + lastInitial, Toast.LENGTH_LONG).show();
-	}
+	}*/
 	
 	private Runnable uploader = new Runnable() {
 		
