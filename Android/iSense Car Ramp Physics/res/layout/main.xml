@@ -53,9 +53,20 @@
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="20dp"
 			android:layout_marginRight="20dp"
-			android:layout_marginTop="20dp"
-			android:layout_marginBottom="20dp"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="10dp"
 			android:layout_weight="1"/>
+		
+		<TextView android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/useMenuTo"
+				android:layout_marginBottom="10dp"
+				android:text="Use Menu to access About or EULA"
+				android:textSize="16dip"
+				android:background="@android:color/white"
+				android:textColor="@android:color/black"
+				android:layout_gravity="center_horizontal"
+				android:gravity="center"/>
 			
 	</LinearLayout>
 	
