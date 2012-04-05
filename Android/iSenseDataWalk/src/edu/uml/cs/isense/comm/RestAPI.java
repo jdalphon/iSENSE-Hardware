@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.util.Log;
 import edu.uml.cs.isense.objects.Experiment;
 import edu.uml.cs.isense.objects.ExperimentField;
 import edu.uml.cs.isense.objects.Item;
@@ -112,8 +111,6 @@ public class RestAPI {
 				connection = "";
 				String data = makeRequest(url);
 				
-				Log.d("Login","I made a request to login!");
-				
 				// Parse JSON Result
 				JSONObject o = new JSONObject(data);
 				session_key = o.getJSONObject("data").getString("session");
@@ -140,7 +137,7 @@ public class RestAPI {
 			
 			return true;
 		}
-		connection = "NONE"; Log.d("login", "connection: "+connection);
+
 		return false;
 	}
 	
@@ -949,8 +946,7 @@ public class RestAPI {
 		switch(status) {
 								
 			case 200:
-				Log.d("rapi", "Successful request");
-			
+
 				// Build Reader and StringBuilder to output to string
 				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				StringBuilder sb = new StringBuilder();
@@ -967,12 +963,10 @@ public class RestAPI {
 			
 			case 404:
 				// Handle 404 page not found
-				Log.d("rapi", "Could not find URL!");
 				break;
 			
 			default:
 				// Catch all for all other HTTP response codes
-				Log.d("rapi", "Returned unhandled error code: " + status);
 				break;
 		}
 		
