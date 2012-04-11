@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Data Walk</string>
+    <string name="get_name">Enter Name\:</string>
     
     <string name="iSenseConfig"><u><b>iSENSE Only Configurations</b></u></string>
     <string name="otherConfig"><u><b>Other Configurations</b></u></string>
     
     <string name="experiments_no_items">No experiments were found.</string>
     
-    <string name="updates">Please carefully review the following agreement for this version of this app:</string>
 	<string name ="eula">This end user license agreement (Agreement) is a legal agreement between you 
 		and the developers at iSENSE (Internet System for Networked Sensor Experimentation) and 
 		ECG (Engaging Computing Group) of the University of Massachusetts Lowell (the Developer) 
@@ -183,6 +183,25 @@
 		http://isense.cs.uml.edu/\n
 		
 	</string>
+	
+	<string name="aboutApp">This app has been solely designed for demonstration at USASEF, and will eventually expire.
+	    The intended use of this app is for users to be able to record where they have been with their phone through the 
+	    application which runs and uploads location data. When ready, the user shall press the \"Hold to Start\" button 
+	    to begin recording points while they walk around.  Data recording will occur and upload every 10 seconds provided 
+	    that GPS is working.
+
+		When the user is finished with his or her walk, he or she may press the \"Hold to Stop\" button, and will be prompted 
+		to visualize the data live on the iSENSE website (isenseproject.org).  The purpose of prompting the user for his 
+		or her first name and last initial is solely for the identification of his or her own sessions on the iSENSE website.
+
+		The user is not permitted to exit this app while recording data via the back button.  However, if the user presses
+		 the home button, this app will stop recording.  Upon this app resuming, the user will notice a dialog box that 
+		 informs him or her of the action they took to pause the app, and the data recording will have halted.
+	 </string>
+	 
+	<string name="OK">OK</string>
+	<string name="firstNameLabel"> First Name: </string>
+	<string name="lastInitialLabel"> Last Initial: </string>
 	<string name="startPrompt">Hold to Start</string>
 	<string name="logoDescription">iSense Logo</string>
 	<string name="stopPrompt">Hold to Stop</string>
