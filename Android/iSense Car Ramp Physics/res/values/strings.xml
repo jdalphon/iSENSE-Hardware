@@ -7,6 +7,8 @@
     <string name="iSenseConfig"><u><b>iSENSE Only Configurations</b></u></string>
     <string name="otherConfig"><u><b>Other Configurations</b></u></string>
     
+    <string name="promptForName">Please enter your name</string>
+    
     <string name="rides_prompt">Choose a ride</string>
     <string-array name="rides_array">
         <item>Unknown</item>

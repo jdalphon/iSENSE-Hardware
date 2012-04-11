@@ -14,9 +14,11 @@ public class SimpleEula {
 
 	private String EULA_PREFIX = "eula_";
 	private Activity mActivity;
+	private Activity mainActiv;
 
 	public SimpleEula(Activity context) {
 		mActivity = context;
+		mainActiv = (Activity) CarRampPhysics.mContext;
 	}
 
 	private PackageInfo getPackageInfo() {
@@ -65,6 +67,7 @@ public class SimpleEula {
 				public void onClick(DialogInterface dialog, int which) {
 					// Close the activity as they have declined the EULA
 					mActivity.finish();
+					mainActiv.finish();
 				}
                     
 			})
@@ -72,6 +75,7 @@ public class SimpleEula {
 				@Override
 				public void onCancel(DialogInterface dialog) {
 					mActivity.finish();
+					mainActiv.finish();
 				}
 			});
 			
