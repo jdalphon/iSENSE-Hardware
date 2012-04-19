@@ -184,19 +184,16 @@
 		
 	</string>
 	
-	<string name="aboutApp">This app has been solely designed for demonstration at USASEF, and will eventually expire.
-	    The intended use of this app is for users to be able to record where they have been with their phone through the 
-	    application which runs and uploads location data. When ready, the user shall press the \"Hold to Start\" button 
-	    to begin recording points while they walk around.  Data recording will occur and upload every 10 seconds provided 
-	    that GPS is working.
-
-		When the user is finished with his or her walk, he or she may press the \"Hold to Stop\" button, and will be prompted 
-		to visualize the data live on the iSENSE website (isenseproject.org).  The purpose of prompting the user for his 
-		or her first name and last initial is solely for the identification of his or her own sessions on the iSENSE website.
-
-		The user is not permitted to exit this app while recording data via the back button.  However, if the user presses
-		 the home button, this app will stop recording.  Upon this app resuming, the user will notice a dialog box that 
-		 informs him or her of the action they took to pause the app, and the data recording will have halted.
+	<string name="aboutApp">This app enables you to record your GPS location continuously while walking outdoors and share the data online. 
+	    It has been designed solely for demonstration at the 2nd USA Science and Engineering Festival and will eventually expire.\n\nWhen 
+	    the app is activated, your GPS coordinates are recorded once every 10 seconds, and the coordinates are shared on the iSENSE 
+	    website (isenseproject.org), where they can be viewed publicly. To make it easy for you to find your contributed data, the app prompts 
+	    you to enter your first name and last initial. If you are not comfortable with your first name, last initial, and location being posted 
+	    on the web, please refrain from using this application.\n\nTo begin recording and sharing data, press and hold the "Hold to Start" button. 
+	    Data will be recorded and uploaded every 10 seconds (provided that the GPS on your mobile device has a satellite fix). When you are ready 
+	    to stop recording, press and hold the "Hold to Stop" button. At that time, you will have the option to view the data live on the iSENSE 
+	    web site.\n\nWhile recording data, you will not be permitted to exit the app by pressing the Back button. However, pressing the Home 
+	    button will stop recording. When the app resumes, a dialog box will appear indicating that data recording was halted. 
 	 </string>
 	 
 	<string name="OK">OK</string>

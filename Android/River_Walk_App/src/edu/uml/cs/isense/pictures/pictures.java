@@ -29,7 +29,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,7 +57,6 @@ public class pictures extends Activity implements LocationListener {
 	
 	private Location loc ;
 	
-	/**JER2**/
 	private String teacherInfo       ;
 	private String schoolInfo        ;
 	private String teacher           ;
@@ -66,12 +64,10 @@ public class pictures extends Activity implements LocationListener {
 	private double Lat  =  42.6404   ; 
 	private double Long = -71.3533   ;
 	private long   curTime           ;
-	/**    **/
+
 	
 	private Context mContext;
 	
-	//private ProgressDialog m_ProgressDialog = null;
-	 
 	private File picture;
 	
 	private Button takePicture;
@@ -322,7 +318,6 @@ public class pictures extends Activity implements LocationListener {
 	}
 
 public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
-    	if (activity == null) Log.d("test", "NULL!");
 		Cursor cursor = null;
 		try {
 		    String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
@@ -438,7 +433,7 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 						bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 10, new FileOutputStream( mpicture )) ;
 						//FileOutputStream.this.close();
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
+						// Auto-generated catch block
 						e.printStackTrace();
 					}	        		        
 				}*/
