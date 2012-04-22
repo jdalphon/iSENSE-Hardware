@@ -209,9 +209,10 @@ public class ConfigurationWindow extends javax.swing.JDialog {
         //Save any changes to a hash map of <Setting,Value>
         HashMap<Integer, Integer> changes = new HashMap<Integer, Integer>();
 
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 6; i++) {
+            System.out.println(tempSettings.get(i) + ":" + pptSettings.get(i));
             if ((int) tempSettings.get(i) != (int) pptSettings.get(i)) {
-                //System.out.println(tempSettings.get(i) + ":" + pptSettings.get(i));
+               
                 changes.put(i, tempSettings.get(i));
             }
         }
@@ -496,8 +497,8 @@ public class ConfigurationWindow extends javax.swing.JDialog {
 
                 int n = JOptionPane.showOptionDialog(this,
                         "Changes to settings have been made.\n"
-                        + "By clicking YES, data will be erased.\n"
-                        + "from the PINPoint and it will reset.",
+                        + "By clicking Continue, the PINPoint will "
+                        + "\n reboot with the correct settings.",
                         "Write changes",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE,

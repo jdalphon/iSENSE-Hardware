@@ -45,6 +45,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import javax.swing.JFileChooser;
 import org.jdesktop.application.SingleFrameApplication;
@@ -71,10 +73,10 @@ public class GoldenEye_v1View extends FrameView {
         initComponents();
 
         tmodel.setColumnIdentifiers(PinpointConverter.tableHeaders);
-        checkMultipleSessions.setEnabled(false);
+
         saveDataButton.setEnabled(false);
         saveMenuItem.setEnabled(false);
-        this.getFrame().setTitle("PINCushion - Goldeneye (5.1)");
+        this.getFrame().setTitle("PINCushion - Goldeneye (5.3)");
     }
 
     public void showAboutBox() {
@@ -109,20 +111,12 @@ public class GoldenEye_v1View extends FrameView {
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         saveMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
-        toolsMenu = new javax.swing.JMenu();
-        updateConversionsMenuItem = new javax.swing.JMenuItem();
-        jSeparator8 = new javax.swing.JPopupMenu.Separator();
-        checkMultipleSessions = new javax.swing.JMenuItem();
-        jSeparator6 = new javax.swing.JPopupMenu.Separator();
-        syncTimeMenuItem = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jSeparator3 = new javax.swing.JPopupMenu.Separator();
-        jSeparator7 = new javax.swing.JPopupMenu.Separator();
-        updateBootloaderMenuItem = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
         configureMenuItem = new javax.swing.JMenuItem();
+        updateConversionsMenuItem = new javax.swing.JMenuItem();
+        syncTimeMenuItem = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        updateBootloaderMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
         jCheckBox1 = new javax.swing.JCheckBox();
@@ -250,68 +244,8 @@ public class GoldenEye_v1View extends FrameView {
 
         menuBar.add(fileMenu);
 
-        toolsMenu.setText(resourceMap.getString("toolsMenu.text")); // NOI18N
-        toolsMenu.setName("toolsMenu"); // NOI18N
-
-        updateConversionsMenuItem.setText(resourceMap.getString("updateConversionsMenuItem.text")); // NOI18N
-        updateConversionsMenuItem.setName("updateConversionsMenuItem"); // NOI18N
-        updateConversionsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateConversionsMenuItemActionPerformed(evt);
-            }
-        });
-        toolsMenu.add(updateConversionsMenuItem);
-
-        jSeparator8.setName("jSeparator8"); // NOI18N
-        toolsMenu.add(jSeparator8);
-
-        checkMultipleSessions.setText(resourceMap.getString("checkMultipleSessions.text")); // NOI18N
-        checkMultipleSessions.setName("checkMultipleSessions"); // NOI18N
-        checkMultipleSessions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkMultipleSessionsActionPerformed(evt);
-            }
-        });
-        toolsMenu.add(checkMultipleSessions);
-
-        jSeparator6.setName("jSeparator6"); // NOI18N
-        toolsMenu.add(jSeparator6);
-
-        syncTimeMenuItem.setText(resourceMap.getString("syncTimeMenuItem.text")); // NOI18N
-        syncTimeMenuItem.setName("syncTimeMenuItem"); // NOI18N
-        syncTimeMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                syncTimeMenuItemActionPerformed(evt);
-            }
-        });
-        toolsMenu.add(syncTimeMenuItem);
-
-        jSeparator5.setName("jSeparator5"); // NOI18N
-        toolsMenu.add(jSeparator5);
-
-        jSeparator4.setName("jSeparator4"); // NOI18N
-        toolsMenu.add(jSeparator4);
-
-        jSeparator2.setName("jSeparator2"); // NOI18N
-        toolsMenu.add(jSeparator2);
-
-        jSeparator1.setName("jSeparator1"); // NOI18N
-        toolsMenu.add(jSeparator1);
-
-        jSeparator3.setName("jSeparator3"); // NOI18N
-        toolsMenu.add(jSeparator3);
-
-        jSeparator7.setName("jSeparator7"); // NOI18N
-        toolsMenu.add(jSeparator7);
-
-        updateBootloaderMenuItem.setText(resourceMap.getString("updateBootloaderMenuItem.text")); // NOI18N
-        updateBootloaderMenuItem.setName("updateBootloaderMenuItem"); // NOI18N
-        updateBootloaderMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateBootloaderMenuItemActionPerformed(evt);
-            }
-        });
-        toolsMenu.add(updateBootloaderMenuItem);
+        jMenu2.setText(resourceMap.getString("jMenu2.text")); // NOI18N
+        jMenu2.setName("jMenu2"); // NOI18N
 
         configureMenuItem.setText(resourceMap.getString("configureMenuItem.text")); // NOI18N
         configureMenuItem.setName("configureMenuItem"); // NOI18N
@@ -320,9 +254,41 @@ public class GoldenEye_v1View extends FrameView {
                 configureMenuItemActionPerformed(evt);
             }
         });
-        toolsMenu.add(configureMenuItem);
+        jMenu2.add(configureMenuItem);
 
-        menuBar.add(toolsMenu);
+        updateConversionsMenuItem.setText(resourceMap.getString("updateConversionsMenuItem.text")); // NOI18N
+        updateConversionsMenuItem.setName("updateConversionsMenuItem"); // NOI18N
+        updateConversionsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateConversionsMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(updateConversionsMenuItem);
+
+        syncTimeMenuItem.setText(resourceMap.getString("syncTimeMenuItem.text")); // NOI18N
+        syncTimeMenuItem.setName("syncTimeMenuItem"); // NOI18N
+        syncTimeMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                syncTimeMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu2.add(syncTimeMenuItem);
+
+        jMenu1.setText(resourceMap.getString("jMenu1.text")); // NOI18N
+        jMenu1.setName("jMenu1"); // NOI18N
+
+        updateBootloaderMenuItem.setText(resourceMap.getString("updateBootloaderMenuItem.text")); // NOI18N
+        updateBootloaderMenuItem.setName("updateBootloaderMenuItem"); // NOI18N
+        updateBootloaderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateBootloaderMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(updateBootloaderMenuItem);
+
+        jMenu2.add(jMenu1);
+
+        menuBar.add(jMenu2);
 
         helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
@@ -371,46 +337,33 @@ public class GoldenEye_v1View extends FrameView {
 
     private void uploadDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadDataButtonActionPerformed
 
-        try {
-            if (pptIsAvailable()) {
-
-                //Set the cursor to busy, upload/convert data, then set to default.
-                GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                data = pinpoint.getData();
-                GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-                tmodel.setRowCount(0);
-                tmodel.setColumnIdentifiers(PinpointConverter.tableHeaders);
-                if (data != null) {
-                    for (int i = 0; i < data.size(); i++) {
-                        tmodel.addRow(data.get(i));
-                    }
-
-                    checkMultipleSessions.setEnabled(true);
-                    saveDataButton.setEnabled(true);
-                    saveMenuItem.setEnabled(true);
-                }
-
-                pinpoint.disconnect();
+        boolean success = false;
+        if (pptIsAvailable()) {
+            try {
+                ArrayList<Integer> params = pinpoint.getUploadApproximation();
+                startProgressBar spb = new startProgressBar(params.get(0), params.get(1), "Uploading PPT Data");
+                spb.start();
+            } catch (NoConnectionException ex) {
+                Logger.getLogger(GoldenEye_v1View.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoDataException ex) {
+                Logger.getLogger(GoldenEye_v1View.class.getName()).log(Level.SEVERE, null, ex);
             }
-      
-        } catch (BackingStoreException ex) {
-            GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            JOptionPane.showMessageDialog(this.getFrame(), "Could not open Java Preferences.", "Conversions error", JOptionPane.ERROR_MESSAGE);
-        } catch (NoDataException ex) {
-            GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            JOptionPane.showMessageDialog(this.getFrame(), "No data was found on the connected PINpoint.");            
-        } catch (IncompatibleConversionException ex) {
-            GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            JOptionPane.showMessageDialog(this.getFrame(), "Conversions file mismatch, please go to \"Tools -> Update Conversions\"");          
+            pinpoint.disconnect();
+            success = true;
+
         }
-        pinpoint.disconnect();
+
+        if (success) {
+            uploadData ud = new uploadData();
+            ud.start();
+        }
+
     }//GEN-LAST:event_uploadDataButtonActionPerformed
 
     private void clearPPTDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearPPTDataButtonActionPerformed
 
         tmodel.setRowCount(0);
-        checkMultipleSessions.setEnabled(false);
+
         saveDataButton.setEnabled(false);
 
     }//GEN-LAST:event_clearPPTDataButtonActionPerformed
@@ -423,7 +376,7 @@ public class GoldenEye_v1View extends FrameView {
     }//GEN-LAST:event_startRecordingButtonActionPerformed
 
     private void saveDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveDataButtonActionPerformed
-       saveMenuItemActionPerformed(evt);
+        saveMenuItemActionPerformed(evt);
     }//GEN-LAST:event_saveDataButtonActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
@@ -435,7 +388,7 @@ public class GoldenEye_v1View extends FrameView {
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void updateConversionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateConversionsMenuItemActionPerformed
-      
+
         try {
 
             pinpointInterface ppI = new pinpointInterface(false);
@@ -443,7 +396,7 @@ public class GoldenEye_v1View extends FrameView {
             ppI.DownloadLatestConversions();
             GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             JOptionPane.showMessageDialog(this.getFrame(), "Conversions Successfully Updated", "Success", JOptionPane.INFORMATION_MESSAGE);
-        
+
         } catch (NoConnectionException ex) {
             //This will never happen. 
         } catch (IOException ex) {
@@ -453,56 +406,6 @@ public class GoldenEye_v1View extends FrameView {
         }
         GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_updateConversionsMenuItemActionPerformed
-
-    private void checkMultipleSessionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkMultipleSessionsActionPerformed
-        int count = 0;
-        ArrayList<ArrayList<String[]>> multiSessions = new ArrayList<ArrayList<String[]>>();
-        multiSessions.add(new ArrayList<String[]>());
-        multiSessions.get(count).add(data.get(0));
-        if (pptIsAvailable()) {
-
-            int sampleRate = pinpoint.getSetting(PinComm.SAMPLE_RATE);
-
-            try {
-                DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss:SSS");
-                long currentTime = format.parse(data.get(0)[0]).getTime();
-                for (int i = 1; i < data.size(); i++) {
-                    long testTime = format.parse(data.get(i)[0]).getTime();
-                    if ((testTime - sampleRate) > currentTime) {
-                        count++;
-                        multiSessions.add(new ArrayList<String[]>());
-                        multiSessions.get(count).add(data.get(i));
-                    } else {
-                        multiSessions.get(count).add(data.get(i));
-                    }
-
-
-
-                    currentTime = testTime;
-                }
-
-
-            } catch (ParseException ex) {
-                System.err.println("Error parsing date while looking for multiple sessions");
-            }
-            pinpoint.disconnect();
-        }
-
-
-        System.out.println(multiSessions.size() + " sessions found on your pinpoint");
-
-        if (multiSessions.size() > 1) {
-            int x = JOptionPane.showConfirmDialog(this.getFrame(), "Multiple Sessions Found would you like to save?", "Multiple Sessions Found", JOptionPane.YES_NO_OPTION);
-            if (x == JOptionPane.YES_OPTION) {
-                FileSaver saver = new FileSaver(this.getFrame());
-                for (ArrayList<String[]> temp : multiSessions) {
-                    saver.saveFile(temp);
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this.getFrame(), "The data is continuous, only one session was found");
-        }
-    }//GEN-LAST:event_checkMultipleSessionsActionPerformed
 
     private void syncTimeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_syncTimeMenuItemActionPerformed
         if (pptIsAvailable()) {
@@ -548,8 +451,8 @@ public class GoldenEye_v1View extends FrameView {
 
                 this.getFrame().setEnabled(false);
 
-                //BootloaderUpdater bu = new BootloaderUpdater(this.getFrame(), file);
-                //bu.start();
+                BootloaderUpdater bu = new BootloaderUpdater(this.getFrame(), file);
+                bu.start();
 
                 GoldenEye_v1App.getApplication().getMainFrame().setEnabled(true);
             }
@@ -564,7 +467,6 @@ public class GoldenEye_v1View extends FrameView {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JPanel buttonPanel;
-    private javax.swing.JMenuItem checkMultipleSessions;
     private javax.swing.JButton clearPPTDataButton;
     private javax.swing.JMenuItem configureMenuItem;
     private javax.swing.JPanel dataPanel;
@@ -572,21 +474,14 @@ public class GoldenEye_v1View extends FrameView {
     private javax.swing.JTable dataTable;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPopupMenu.Separator jSeparator1;
-    private javax.swing.JPopupMenu.Separator jSeparator2;
-    private javax.swing.JPopupMenu.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
-    private javax.swing.JPopupMenu.Separator jSeparator6;
-    private javax.swing.JPopupMenu.Separator jSeparator7;
-    private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton saveDataButton;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JButton startRecordingButton;
     private javax.swing.JMenuItem syncTimeMenuItem;
-    private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem updateBootloaderMenuItem;
     private javax.swing.JMenuItem updateConversionsMenuItem;
     private javax.swing.JButton uploadDataButton;
@@ -629,6 +524,47 @@ public class GoldenEye_v1View extends FrameView {
         data = tempList;
     }
 
+    private class uploadData extends Thread {
+
+        public uploadData() {
+        }
+
+        public void run() {
+            try {
+                if (pptIsAvailable()) {
+
+                    data = pinpoint.getData();
+
+                    tmodel.setRowCount(0);
+                    tmodel.setColumnIdentifiers(PinpointConverter.tableHeaders);
+                    if (data != null) {
+                        for (int i = 0; i < data.size(); i++) {
+                            tmodel.addRow(data.get(i));
+                        }
+
+
+                        saveDataButton.setEnabled(true);
+                        saveMenuItem.setEnabled(true);
+                    }
+
+                    pinpoint.disconnect();
+
+                }
+
+            } catch (BackingStoreException ex) {
+                JOptionPane.showMessageDialog(GoldenEye_v1App.getApplication().getMainFrame(), "Could not open Java Preferences.", "Conversions error", JOptionPane.ERROR_MESSAGE);
+            } catch (NoDataException ex) {
+                JOptionPane.showMessageDialog(GoldenEye_v1App.getApplication().getMainFrame(), "No data was found on the connected PINpoint.");
+            } catch (IncompatibleConversionException ex) {
+                JOptionPane.showMessageDialog(GoldenEye_v1App.getApplication().getMainFrame(), "Conversions file mismatch, please go to \"Tools -> Update Conversions\"");
+            }
+
+            pinpoint.disconnect();
+
+
+        }
+    }
+
     private class BootloaderUpdater extends Thread {
 
         JFrame parent;
@@ -659,9 +595,9 @@ public class GoldenEye_v1View extends FrameView {
 
                     }
                 }
-            } catch (InvalidHexException ex){
+            } catch (InvalidHexException ex) {
                 GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                JOptionPane.showMessageDialog(parent, ex.GetErrorType(), "Bootloader Error", JOptionPane.ERROR_MESSAGE);         
+                JOptionPane.showMessageDialog(parent, ex.GetErrorType(), "Bootloader Error", JOptionPane.ERROR_MESSAGE);
             } catch (NoConnectionException ex) {
                 GoldenEye_v1App.getApplication().getMainFrame().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 JOptionPane.showMessageDialog(parent, "Could not connect to PINPoint", "No Connection Error", JOptionPane.ERROR_MESSAGE);

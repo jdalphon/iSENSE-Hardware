@@ -190,12 +190,21 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="toolsMenu">
+        <Menu class="javax.swing.JMenu" name="jMenu2">
           <Properties>
-            <Property name="text" type="java.lang.String" resourceKey="toolsMenu.text"/>
-            <Property name="name" type="java.lang.String" value="toolsMenu" noResource="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="jMenu2.text"/>
+            <Property name="name" type="java.lang.String" value="jMenu2" noResource="true"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="configureMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="configureMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="configureMenuItem" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="configureMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="updateConversionsMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="updateConversionsMenuItem.text"/>
@@ -204,25 +213,6 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateConversionsMenuItemActionPerformed"/>
               </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator8">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator8" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="checkMultipleSessions">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="checkMultipleSessions.text"/>
-                <Property name="name" type="java.lang.String" value="checkMultipleSessions" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkMultipleSessionsActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator6">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator6" noResource="true"/>
-              </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="syncTimeMenuItem">
               <Properties>
@@ -233,54 +223,23 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="syncTimeMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
+            <Menu class="javax.swing.JMenu" name="jMenu1">
               <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator5" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="jMenu1.text"/>
+                <Property name="name" type="java.lang.String" value="jMenu1" noResource="true"/>
               </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator4" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator2" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator1" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator3" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator7">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="jSeparator7" noResource="true"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="updateBootloaderMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="updateBootloaderMenuItem.text"/>
-                <Property name="name" type="java.lang.String" value="updateBootloaderMenuItem" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateBootloaderMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="configureMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="configureMenuItem.text"/>
-                <Property name="name" type="java.lang.String" value="configureMenuItem" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="configureMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="updateBootloaderMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="updateBootloaderMenuItem.text"/>
+                    <Property name="name" type="java.lang.String" value="updateBootloaderMenuItem" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateBootloaderMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">

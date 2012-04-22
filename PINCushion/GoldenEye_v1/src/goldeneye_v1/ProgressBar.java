@@ -50,11 +50,9 @@ public class ProgressBar extends javax.swing.JFrame {
         Timeout = TimePerTick;
         Task = TheTask;
         
-     
-
         progressBar.setMaximum(Ticks);
 
-        this.setResizable(true);
+        this.setResizable(false);
         
         titleLabel.setText(Task + "...");
 
@@ -66,13 +64,13 @@ public class ProgressBar extends javax.swing.JFrame {
             try {
                 Thread.sleep(Timeout);
                 progressBar.setValue(i);
-                //progressBar.updateUI();
+               
             } catch (InterruptedException ex) {
                 Logger.getLogger(ProgressBar.class.getName()).log(Level.SEVERE, null, ex);
             }
            
         }
-        this.dispose();
+       this.dispose();
 
     }
 
