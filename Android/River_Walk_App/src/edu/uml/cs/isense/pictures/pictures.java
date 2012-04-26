@@ -3,10 +3,6 @@ package edu.uml.cs.isense.pictures;
 /* Experiment 294 Now 347 */
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,10 +18,6 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -36,16 +28,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 import edu.uml.cs.isense.comm.RestAPI;
 
@@ -68,8 +57,6 @@ public class pictures extends Activity implements LocationListener {
 	
 	private Location loc ;
 	
-	/**JER2**/
-	private File   mpicture          ;
 	private String teacherInfo       ;
 	private String schoolInfo        ;
 	private String teacher           ;
@@ -77,14 +64,10 @@ public class pictures extends Activity implements LocationListener {
 	private double Lat  =  42.6404   ; 
 	private double Long = -71.3533   ;
 	private long   curTime           ;
-	PowerManager   pm                ;
-	PowerManager.WakeLock wl         ;
-	/**    **/
+
 	
 	private Context mContext;
 	
-	//private ProgressDialog m_ProgressDialog = null;
-	 
 	private File picture;
 	
 	private Button takePicture;
@@ -248,7 +231,6 @@ public class pictures extends Activity implements LocationListener {
      showDialog(DIALOG_LOGIN_ID);
     }
     
-    /**JER1*********************************************************************************************/
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuItem.OnMenuItemClickListener menuClicker = new
@@ -323,7 +305,6 @@ public class pictures extends Activity implements LocationListener {
 
 		 	alert.show();
     }
-    /*******************************************************************************************************/
     
     @Override
 	protected void onResume() {
@@ -337,7 +318,6 @@ public class pictures extends Activity implements LocationListener {
 	}
 
 public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
-    	if (activity == null) Log.d("test", "NULL!");
 		Cursor cursor = null;
 		try {
 		    String [] proj={MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID, MediaStore.Images.ImageColumns.ORIENTATION};
@@ -379,9 +359,6 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 		@Override
 		public void run() {
 			new TaskWait().execute();
-			pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Uploading");
-			 wl.acquire();//prevents upload from stopping		
 			
 			/**JER 3**************************************************************************************************************/
 			if (teacherInfo != null) teacher = " - " + teacherInfo ;
@@ -410,7 +387,7 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 			Boolean result = rapi.updateSessionData(sessionId, experimentInput.getText().toString(), dataJSON);
 			
 			if (result) {
-				rapi.uploadPictureToSession(mpicture, experimentInput.getText().toString(), 
+				rapi.uploadPictureToSession(picture, experimentInput.getText().toString(), 
 						sessionId, name.getText().toString() + teacher + school, 
 						name.getText().toString() + Descriptor.desString);
 			}
@@ -427,41 +404,42 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
 				
 				curTime = System.currentTimeMillis()/1000 ;
 				picture = convertImageUriToFile(imageUri, this);
-				String picture_me = picture.getAbsolutePath();
+				/*String picturePath = picture.getAbsolutePath();
 	            
-				/** **/
+				
 				Bitmap bitmapOrg ;
-				// load the origial BitMap (500 x 500 px)
-				if( BitmapFactory.decodeFile(picture_me) != null ) {
-					bitmapOrg = BitmapFactory.decodeFile(picture_me) ;
-		        int width = bitmapOrg.getWidth();
-		        int height = bitmapOrg.getHeight();
-		        int newWidth = 1024;
-		        int newHeight = 768;
+				// load the original BitMap (500 x 500 px)
+				if( BitmapFactory.decodeFile(picturePath) != null ) {
+					bitmapOrg = BitmapFactory.decodeFile(picturePath) ;
+					int width = bitmapOrg.getWidth();
+					int height = bitmapOrg.getHeight();
+					int newWidth = 1024;
+					int newHeight = 768;
 		        
-		        // calculate the scale
-		        float scaleWidth = ((float) newWidth) / width;
-		        float scaleHeight = ((float) newHeight) / height;
+					// calculate the scale
+					float scaleWidth = ((float) newWidth) / width;
+					float scaleHeight = ((float) newHeight) / height;
 		        
-		        // create a matrix for the manipulation
-		        Matrix matrix = new Matrix();
-		        // resize the bit map
-		        matrix.postScale(scaleWidth, scaleHeight);
-
-		        // recreate the new Bitmap
-		        bitmapOrg = Bitmap.createBitmap(bitmapOrg, 1, 1, 
-		                          1024, 768, matrix, true);
-		        try {
-					bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 10, new FileOutputStream( mpicture )) ;
-					//FileOutputStream.this.close();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	        		        
-				}
+					// create a matrix for the manipulation
+					Matrix matrix = new Matrix();
+		        
+					// resize the bit map
+					matrix.postScale(scaleWidth, scaleHeight);
+		        
+					// recreate the new Bitmap
+					bitmapOrg = Bitmap.createBitmap(bitmapOrg, 1, 1, 
+							1024, 768, matrix, true);
+					try {
+						bitmapOrg.compress(Bitmap.CompressFormat.JPEG, 10, new FileOutputStream( mpicture )) ;
+						//FileOutputStream.this.close();
+					} catch (FileNotFoundException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}	        		        
+				}*/
 				
 		        takePicture.setEnabled(false);
-		        //new Task().execute();
+		        new Task().execute();
 			}
 		} else if (requestCode == EXPERIMENT_CODE) {
     		if (resultCode == Activity.RESULT_OK) {
@@ -533,8 +511,7 @@ public static File convertImageUriToFile (Uri imageUri, Activity activity)  {
             dia.cancel();
             
             Toast.makeText(pictures.this, "Your picture has uploaded successfully.", Toast.LENGTH_LONG).show();
-            wl.release();
-            
+                        
             pictures.c1  = false; pictures.c2  = false; pictures.c3 = false;
 	        pictures.c4  = false; pictures.c5  = false; pictures.c6 = false;
 	        pictures.c7  = false; pictures.c8  = false; pictures.c9 = false;
