@@ -40,7 +40,7 @@ public class RestAPI {
 	private static RestAPI instance = null;
 	private String username = null;
 	private static String session_key = null;
-	private final String base_url = "http://isensedev.cs.uml.edu/ws/api.php";
+	private final String base_url = "http://isense.cs.uml.edu/ws/api.php";
     private final String charEncoding = "iso-8859-1";
 	private ConnectivityManager connectivityManager;
 	private RestAPIDbAdapter mDbHelper;
@@ -519,13 +519,13 @@ public class RestAPI {
 				uid = o.getJSONObject("data").getInt("uid");
 				
 				if (isLoggedIn()) {
-					this.username = username;
+					this.username = username; 
 					return true;
-				}
+				} 
 				
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
-				connection = "NONE";
+				connection = "NONE"; 
 				return false;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -533,7 +533,7 @@ public class RestAPI {
 				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
-				connection = "600";
+				connection = "600"; 
 				return false;
 			}
 			

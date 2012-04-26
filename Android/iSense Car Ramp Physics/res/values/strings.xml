@@ -71,6 +71,28 @@
     
     <string name="experiments_no_items">No experiments were found.</string>
     
+    <string name="about_app">
+        This app enables you to record the accelerations experienced by your mobile device
+        and share the data online. It has been designed solely for demonstration at the 2nd 
+        USA Science and Engineering Festival and will eventually expire.\n\nTo
+        
+		begin recording data, press and hold the \"Hold to Start\" button. Acceleration data 
+		along the Y axis will be recorded continuously for 10 seconds, and then recording will 
+		stop automatically. At that time, you will have the option to share the data on the 
+		iSENSE website (isenseproject.org) where they can be viewed publicly, or you may simply 
+		throw the data away. If you choose to upload the data set, you may immediately view 
+		a graph of the data live on the iSENSE website.\n\nTo
+		
+		make it easy for you to find your contributed data, this app prompts you to enter your 
+		first name and last initial. If you are not comfortable with your first name, last initial,
+		rough location (specifies city/town at most), and acceleration data being posted on the 
+		web, please refrain from using this application.\n\nWhile
+		
+		recording data, you will not be permitted to exit the app by pressing the 
+		Back button. However, pressing the Home button will stop recording. When the app 
+		resumes, a dialog box will appear indicating that data recording was halted.\n
+    </string>
+    
     <string name="updates">Please carefully review the following agreement for this version of this app:</string>
 	<string name ="eula">This end user license agreement (Agreement) is a legal agreement between you 
 		and the developers at iSENSE (Internet System for Networked Sensor Experimentation) and 

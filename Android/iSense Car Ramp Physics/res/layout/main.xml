@@ -61,7 +61,7 @@
 				android:layout_height="wrap_content"
 				android:id="@+id/useMenuTo"
 				android:layout_marginBottom="10dp"
-				android:text="Use Menu to access About or EULA"
+				android:text="Use Menu to access About"
 				android:textSize="16dip"
 				android:background="@android:color/white"
 				android:textColor="@android:color/black"

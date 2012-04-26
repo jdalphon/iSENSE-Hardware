@@ -40,14 +40,15 @@ public final class R {
         public static final int beep=0x7f040000;
     }
     public static final class string {
+        public static final int about_app=0x7f050007;
         public static final int app_name=0x7f050001;
-        public static final int eula=0x7f050008;
+        public static final int eula=0x7f050009;
         public static final int experiments_no_items=0x7f050006;
         public static final int hello=0x7f050000;
         public static final int iSenseConfig=0x7f050002;
         public static final int otherConfig=0x7f050003;
         public static final int promptForName=0x7f050004;
         public static final int rides_prompt=0x7f050005;
-        public static final int updates=0x7f050007;
+        public static final int updates=0x7f050008;
     }
 }
