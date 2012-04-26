@@ -29,7 +29,7 @@ public class SimpleEula {
 		return pi;
 	}
 
-	public void show() {
+	public AlertDialog.Builder show() {
 		PackageInfo versionInfo = getPackageInfo();
 
 		// the eulaKey changes every time you increment the version number in the AndroidManifest.xml
@@ -74,8 +74,11 @@ public class SimpleEula {
 					mActivity.finish();
 				}
 			});
-			builder.create().show();
+			
+			return builder;
+			//builder.create().show();
 		}
+		return null;
 	}
 
 }

@@ -166,9 +166,9 @@
 		their respective successors and assigns, officers, directors, employees, agents, licensors, 
 		representatives, advertisers, service providers, and suppliers harmless against any and all 
 		claims, demands, actions, losses, damages, costs and expenses (including reasonable attorneys\' 
-		fees), arising out of or relating to your (a) breach or violation of this Agreement, (b) 
-		infringement, misappropriation or any violation of the rights of any other party, (c) violation 
-		or non-compliance with any applicable law, rule or regulation, and (d) use, alteration 
+		fees), arising out of or relating to your (i) breach or violation of this Agreement, (ii) 
+		infringement, misappropriation or any violation of the rights of any other party, (iii) violation 
+		or non-compliance with any applicable law, rule or regulation, and (iv) use, alteration 
 		or export of the Application (or any component thereof) in violation of this Agreement.\n\n
 		
 		8. WIRELESS ACCESS CHARGES. Certain Application functions and Services require data access, 
@@ -218,10 +218,10 @@
 		all copies, full or partial, thereof.\n\n
 		
 		13. GOVERNING LAW AND INTERPRETATION. To the extent not prohibited by law, you agree 
-		(a) that this Agreement and all disputes, claims, actions, suits or other proceedings 
+		(i) that this Agreement and all disputes, claims, actions, suits or other proceedings 
 		arising hereunder shall be governed by, and construed in accordance with, the substantive 
-		law of the state of Massachusetts (b) to irrevocably submit to the sole and exclusive 
-		jurisdiction of the courts of Massachusetts, and (c) to irrevocably consent to the exercise 
+		law of the state of Massachusetts (ii) to irrevocably submit to the sole and exclusive 
+		jurisdiction of the courts of Massachusetts, and (iii) to irrevocably consent to the exercise 
 		of personal jurisdiction by such courts and waive any right to plead, claim or allege that 
 		any of the judicial districts of Massachusetts, USA is an inconvenient forum. No failure or 
 		delay by Developer, its affiliates or licensors to exercise any right or enforce any 
@@ -239,9 +239,8 @@
 		Engaging Computing Group\n
 		Olsen Hall, Room 306\n
 		198 Riverside St.\n
-		Lowell, MA, USA\n
+		Lowell, MA\n
 		01854\n
-		fredm@cs.uml.edu\n
 		http://isense.cs.uml.edu/\n
 		
 	</string>

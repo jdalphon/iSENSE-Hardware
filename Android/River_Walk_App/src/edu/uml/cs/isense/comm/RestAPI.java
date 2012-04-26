@@ -40,7 +40,6 @@ import edu.uml.cs.isense.objects.SessionData;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.util.Log;
 /**
  * 
  * @author johnfertitta
@@ -260,15 +259,15 @@ public class RestAPI {
 		
 			try {
 				DataInputStream inStream = new DataInputStream(conn.getInputStream());
-				String str;
+				//String str;
 
-				while ((str = inStream.readLine()) != null) {
-					Log.d("rapi", "Server Response" + str);
-				}
+				//while ((str = inStream.readLine()) != null) {
+					//Log.d("rapi", "Server Response" + str);
+				//}
 				inStream.close();
 				return true;
 			} catch (IOException ioex) {
-				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
+				//Log.e("rapi", "error: " + ioex.getMessage(), ioex);
 				return false;
 			}
 			
@@ -372,15 +371,15 @@ public class RestAPI {
 		
 			try {
 				DataInputStream inStream = new DataInputStream(conn.getInputStream());
-				String str;
+				//String str;
 
-				while ((str = inStream.readLine()) != null) {
+				/*while ((str = inStream.readLine()) != null) {
 					Log.d("rapi", "Server Response" + str);
-				}
+				}*/
 				inStream.close();
 				return true;
 			} catch (IOException ioex) {
-				Log.e("rapi", "error: " + ioex.getMessage(), ioex);
+				//Log.e("rapi", "error: " + ioex.getMessage(), ioex);
 				return false;
 			}
 			
@@ -1243,7 +1242,7 @@ public class RestAPI {
 		switch(status) {
 								
 			case 200:
-				Log.d("rapi", "Successful request");
+				//Log.d("rapi", "Successful request");
 			
 				// Build Reader and StringBuilder to output to string
 				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -1261,12 +1260,12 @@ public class RestAPI {
 			
 			case 404:
 				// Handle 404 page not found
-				Log.d("rapi", "Could not find URL!");
+				//Log.d("rapi", "Could not find URL!");
 				break;
 			
 			default:
 				// Catch all for all other HTTP response codes
-				Log.d("rapi", "Returned unhandled error code: " + status);
+				//Log.d("rapi", "Returned unhandled error code: " + status);
 				break;
 		}
 		
