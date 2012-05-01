@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,7 +51,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -75,6 +80,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -106,8 +112,10 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	
 	private SensorManager mSensorManager;
 	private LocationManager mLocationManager;
+	private LocationManager mRoughLocManager;
 	
 	private Location loc;
+	private Location roughLoc;
 	private float accel[];
 	private float orientation[];
 	private Timer timeTimer;
@@ -148,12 +156,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     private static int    rideIndex      =  0 ;
     private static String studentNumber  = "1";
  
-    private int    elapsedMinutes =  0 ;
-    private int    elapsedSeconds =  0 ;
-    private int    elapsedMillis  =  0 ;
-    private int    totalMillis    =  0 ;
-    
-    private int dataPointCount = 0;
+    private int    elapsedMinutes = 0;
+    private int    elapsedSeconds = 0;
+    private int    elapsedMillis  = 0;
+    private int    totalMillis    = 0;
+    private int    dataPointCount = 0;
+
+    private long   currentTime    = 0;
     
     private String dateString;
     RestAPI rapi ;
@@ -213,61 +222,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
         mContext = this;
         
-        Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
-    	mwidth  = deviceDisplay.getWidth();
-    	mheight = deviceDisplay.getHeight();
-        
+        //initialize everything you're going to need
+        initVars();
+               
         // Display the End User Agreement
-        AlertDialog.Builder adb = new SimpleEula(this).show();
-        if(adb != null) {
-        	Dialog dialog = adb.create();
-        	
-        	Display display = getWindowManager().getDefaultDisplay(); 
-        	int mwidth = display.getWidth();
-        	int mheight = display.getHeight();
-        	
-        	dialog.show();
-        	
-        	int apiLevel = getApiLevel();
-        	if(apiLevel >= 11) {
-
-        		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        	
-        		lp.copyFrom(dialog.getWindow().getAttributes());
-        		lp.width = mwidth;
-        		lp.height = mheight;
-        		lp.gravity = Gravity.CENTER_VERTICAL;
-        		lp.dimAmount=0.7f;
-	    	
-        		dialog.getWindow().setAttributes(lp);
-        		dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        		
-        	}
-        }
-       
-        rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
+        displayEula();
         
-        //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
-        mHandler = new Handler();
-        
-        pictures = new ArrayList<File>();
-        videos   = new ArrayList<File>();
-
-        startStop = (Button) findViewById(R.id.startStop);
-              
-        values = (TextView) findViewById(R.id.values);
-        rideName = (TextView) findViewById(R.id.ridename);
-        
-        rideName.setText("Ride Name: " + rideNameString);
-        
-        picCount = (TextView) findViewById(R.id.pictureCount);
-        
-        loginInfo = (TextView) findViewById(R.id.loginInfo);
-        loginInfo.setText(" Not Logged In");
-        loginInfo.setTextColor(Color.RED);
-        
-        /* This block useful for if onBackPressed - retains some things from previous session */
+        //This block useful for if onBackPressed - retains some things from previous session
         if(running)
     		showDialog(DIALOG_FORCE_STOP);
     	if(loginName != "") {
@@ -323,6 +284,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 						len = 0; len2 = 0; dataPointCount = 0;
 						i   = 0;
 						beginWrite = true;
+						currentTime = getUploadTime();
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
@@ -381,7 +343,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 											rawMag[0] + ", " + 
 											rawMag[1] + ", " + 
 											rawMag[2] + ", " + 
-											elapsedMillis + "\n";
+											currentTime + elapsedMillis + "\n";
 									
 									JSONArray dataJSON = new JSONArray();
 									
@@ -397,7 +359,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 										/* Magnetic-x */ dataJSON.put(rawMag[0]);
 										/* Magnetic-y */ dataJSON.put(rawMag[1]);
 										/* Magnetic-z */ dataJSON.put(rawMag[2]);
-										/* Time       */ dataJSON.put(elapsedMillis); 
+										/* Time       */ dataJSON.put(currentTime + elapsedMillis); 
 										                 
 										dataSet.put(dataJSON);
 									
@@ -425,18 +387,14 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			} 
         	
         });
-        
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        
-        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-        mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                       
         Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_FINE);
         
-        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && mRoughLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
         	mLocationManager.requestLocationUpdates(mLocationManager.getBestProvider(c, true), 0, 0, AmusementPark.this);
-        else {
+        	mRoughLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, AmusementPark.this);
+        } else {
         	showDialog(DIALOG_NO_GPS);
         }
         
@@ -448,7 +406,13 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
         
         mMediaPlayer = MediaPlayer.create(this, R.raw.beep); 
         
-    } 
+    }
+    
+    long getUploadTime()
+    {
+    		Calendar c = Calendar.getInstance();
+    		return ((long) c.getTimeInMillis());
+    }
     
     public void updateFile( String data ) {
     	
@@ -499,22 +463,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	    toastSuccess = false;
     	}
     	
-    	/*for(int i = 0; i < pictures.size(); i++) {
-    		File f = pictures.get(i);
-    		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".jpeg");
-    		f.renameTo(newFile);
-    	}
-    	
-    	pictures.clear();
-    	
-    	for(int i = 0; i < videos.size(); i++) {
-    		File f = videos.get(i);
-    		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".3gp");
-    		f.renameTo(newFile);
-    	}
-    	
-    	videos.clear();*/
-    	
     }
     
     public void pushPicture() {
@@ -536,7 +484,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		File f = pictures.get(i);
     		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".jpeg");
     		f.renameTo(newFile);
-    		pictureArray.add(newFile); //clutch fix
+    		pictureArray.add(newFile);
     	}
     	
     	pictures.clear();
@@ -559,7 +507,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     		File f = videos.get(i);
     		File newFile = new File(folder, rideNameString + "-" + seatString + "-" + dateString + "-" + (i+1) + ".3gp");
     		f.renameTo(newFile);
-    		videoArray.add(newFile); // copying the clutchness
+    		videoArray.add(newFile);
     	}
     	
     	videos.clear();
@@ -569,6 +517,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     public void onPause() {
     	super.onPause();
     	mLocationManager.removeUpdates(AmusementPark.this);
+    	mRoughLocManager.removeUpdates(AmusementPark.this);
     	mSensorManager.unregisterListener(AmusementPark.this);
     	if (timeTimer != null) timeTimer.cancel();
     	inPausedState = true;
@@ -706,6 +655,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	@Override
 	public void onLocationChanged(Location location) {
 		loc = location;
+		roughLoc = location;
 	}
 
 	@Override
@@ -866,7 +816,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    				
 	    				String isValid = experimentInput.getText().toString();
 		    			if( successLogin  && (isValid.length() > 0) ) {
-		    				//executeIsenseTask = true;
+ 		    				//executeIsenseTask = true;
 			    			dialoginterface.dismiss();
 			    			new Task().execute();
 			    		} else {
@@ -969,44 +919,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    	break;
 	    }
 	    
-	    
-	    	
-	    int apiLevel = getApiLevel();
-	    if(apiLevel >= 11) {
-	    	dialog.show(); /* works but doesnt center it */
-		    	
-		   	lp.copyFrom(dialog.getWindow().getAttributes());
-		   	lp.width = mwidth;
-		   	lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-		   	lp.gravity = Gravity.CENTER_VERTICAL;
-		   	lp.dimAmount=0.7f;
-		   	
-		   	dialog.getWindow().setAttributes(lp);
-		   	dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-		   	dialog.getWindow().setAttributes(lp);
-		    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-		    	
-		    dialog.setOnDismissListener(new OnDismissListener() {
-	           	@Override
-	           	public void onDismiss(DialogInterface dialog) {
-	           		removeDialog(id);
-	           	}
-	        });
-		    	
-		   	return null;
-		    	
-	    } else {
-	    		
-	    	dialog.setOnDismissListener(new OnDismissListener() {
-	            @Override
-	            public void onDismiss(DialogInterface dialog) {
-	            	removeDialog(id);
-	            }
-	        });
-	    		
-	    	return dialog;
-	    }
-	    	    
+	    return apiDialogCheckerCase(dialog, lp, id);    	    
 	    
 	}
 
@@ -1014,8 +927,7 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
     	
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	    	
-    	//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    	canobieIsChecked = canobieBackup;
+      	canobieIsChecked = canobieBackup;
     	        
         LayoutInflater vi = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = vi.inflate(R.layout.setup, null);
@@ -1325,7 +1237,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {				
 	            File f = convertImageUriToFile(imageUri, this);
 	            pictures.add(f);
-	            //pictureArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1333,7 +1244,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 			if(resultCode == RESULT_OK) {
 				File f = convertVideoUriToFile(videoUri, this);
 				videos.add(f);
-				//videoArray.add(f);
 				mediaCount++;
 	            picCount.setText("Pictures and Videos Taken: " + mediaCount);
 			}
@@ -1344,33 +1254,62 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 		}
 		
 	}
-	
-	
+		
 	private Runnable uploader = new Runnable() {
 		
 		@Override
 		public void run() {
 		
 			int sessionId = -1;
+			String city = "", state = "", country = "", addr = "";
+			List<Address> address = null;
+			
+			try {
+				if (roughLoc != null) {
+					address = new Geocoder(AmusementPark. this,Locale.getDefault())
+						.getFromLocation(roughLoc.getLatitude(), roughLoc.getLongitude(), 1);
+					if (address.size() > 0) {
+						city    = address.get(0).getLocality();
+						state   = address.get(0).getAdminArea();
+						country = address.get(0).getCountryName();
+						addr    = address.get(0).getAddressLine(0);
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
 			if(nameOfSession.equals("")) {
-				sessionId = rapi.createSession(experimentInput.getText().toString(), 
-						"*Session Name Not Provided*", 
-						"Automated Submission Through Android App", 
-						"N/A", "N/A", "United States");
+				if(address.size() <= 0 || address == null) {
+					sessionId = rapi.createSession(experimentInput.getText().toString(), 
+							"*Session Name Not Provided*", 
+							"Automated Submission Through Android App", 
+							"N/A", "N/A", "United States");
+				} else {
+					sessionId = rapi.createSession(experimentInput.getText().toString(), 
+							"*Session Name Not Provided*", 
+							"Automated Submission Through Android App", 
+							addr, city + ", " + state, country);
+				}
 			} else {
-				sessionId = rapi.createSession(experimentInput.getText().toString(), 
-						nameOfSession, 
-						"Automated Submission Through Android App", 
-						"N/A", "N/A", "United States");
+				if(address == null || address.size() <= 0) {
+					sessionId = rapi.createSession(experimentInput.getText().toString(), 
+							nameOfSession, 
+							"Automated Submission Through Android App", 
+							"N/A", "N/A", "United States");
+				} else {
+					sessionId = rapi.createSession(experimentInput.getText().toString(), 
+							nameOfSession, 
+							"Automated Submission Through Android App", 
+							addr, city + ", " + state, country);
+				}
 			}
 			
 			
-			boolean hasPut = rapi.putSessionData( sessionId, experimentInput.getText().toString(), dataSet);
-			Log.e("Pics", "putSessionData success: " + hasPut);
+			rapi.putSessionData( sessionId, experimentInput.getText().toString(), dataSet);
 			
 			int pic = pictureArray.size();
-			int vid = videoArray.size();
+
 			
 			while(pic > 0) {
 				boolean hUp;
@@ -1387,21 +1326,6 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 				
 			}
 			pictureArray.clear();
-			
-			while(vid > 0) {
-				/* THIS DOESNT WORK IN RAPI YET */
-				boolean hUp;
-				if(nameOfSession.equals(""))
-					hUp = rapi.uploadVideoToSession(videoArray.get(vid - 1),
-							experimentInput.getText().toString(), 
-							sessionId, "*Session Name Not Provided*", "N/A");
-				else
-					hUp = rapi.uploadVideoToSession(videoArray.get(vid - 1),
-							experimentInput.getText().toString(), 
-							sessionId, sessionName.getText().toString(), "N/A");
-				Log.e("Vids", "has uploaded: " + hUp);
-				vid--;
-			}
 			videoArray.clear();
 			
 			
@@ -1462,6 +1386,101 @@ public class AmusementPark extends Activity implements SensorEventListener, Loca
 	    @Override  protected void onPostExecute(Void voids) {
 	    	dontToastMeTwice = false;
 	    }
+	}
+	
+	//everything you need initialized for onCreate
+	private void initVars()
+	{
+        mHandler = new Handler();
+        
+        Display deviceDisplay = getWindowManager().getDefaultDisplay(); 
+    	mwidth  = deviceDisplay.getWidth();
+    	mheight = deviceDisplay.getHeight();
+        
+        rapi = RestAPI.getInstance((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE), getApplicationContext());
+
+        pictures = new ArrayList<File>();
+        videos   = new ArrayList<File>();
+
+        startStop = (Button) findViewById(R.id.startStop);
+              
+        values = (TextView) findViewById(R.id.values);
+        rideName = (TextView) findViewById(R.id.ridename);
+        
+        rideName.setText("Ride Name: " + rideNameString);
+        
+        picCount = (TextView) findViewById(R.id.pictureCount);
+        
+        loginInfo = (TextView) findViewById(R.id.loginInfo);
+        loginInfo.setText(" Not Logged In");
+        loginInfo.setTextColor(Color.RED);
+        
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        
+        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        mRoughLocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+	}
+	
+	//takes care of everything to do with EULA
+	private void displayEula()
+	{
+		AlertDialog.Builder adb = new SimpleEula(this).show();
+		if(adb != null) {
+			Dialog dialog = adb.create();	
+			dialog.show();
+
+			apiTabletDisplay(dialog);
+		}
+	}
+	
+	//apiTabletDisplay for Dialog Building on Tablets
+	boolean apiTabletDisplay(Dialog dialog)
+	{
+		int apiLevel = getApiLevel();
+		if(apiLevel >= 11) {
+			dialog.show();
+			
+			WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+	
+			lp.copyFrom(dialog.getWindow().getAttributes());
+			lp.width = mwidth;
+			lp.height = WindowManager.LayoutParams.MATCH_PARENT;;
+			lp.gravity = Gravity.CENTER_VERTICAL;
+			lp.dimAmount=0.7f;
+	
+			dialog.getWindow().setAttributes(lp);
+			dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+			
+			return true;
+		} else return false;
+		
+	}
+	
+	//deals with Dialog creation whether api is tablet or not
+	Dialog apiDialogCheckerCase(Dialog dialog, LayoutParams lp, final int id)
+	{
+		if(apiTabletDisplay(dialog)) {
+		    	
+			dialog.setOnDismissListener(new OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					removeDialog(id);
+				}
+			});
+		    return null;
+		    
+		} else {
+	    		
+			dialog.setOnDismissListener(new OnDismissListener() {
+				@Override
+	            public void onDismiss(DialogInterface dialog) {
+					removeDialog(id);
+				}
+			});
+	    		
+			return dialog;
+		}
 	}
 
 }
